@@ -1,0 +1,50 @@
+syntax = "proto3";
+package kratos.api;
+
+option go_package = "server/internal/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  message Database {
+    bool enable = 1;
+    string driver = 2;
+    string source = 3;
+  }
+  message Redis {
+    bool enable = 1;
+    string network = 2;
+    string addr = 3;
+    google.protobuf.Duration read_timeout = 4;
+    google.protobuf.Duration write_timeout = 5;
+  }
+  Database database = 1;
+  Redis redis = 2;
+  message SpiceDB {
+    bool enable = 1;
+    string endpoint = 2;
+    string token = 3;
+    bool insecure = 4;
+  }
+  SpiceDB spicedb = 3;
+}

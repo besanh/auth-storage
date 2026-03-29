@@ -1,0 +1,41 @@
+// =========================
+// CORE IDENTITIES
+// =========================
+definition user {}
+
+definition service {}
+
+definition group {
+    relation member: user
+}
+
+definition platform {
+    relation member: user
+}
+
+// =========================
+// FOLDER
+// =========================
+definition folder {
+    relation parent: folder
+    relation owner: user | service
+    
+    // Wildcard 'user:*' allows public link sharing effortlessly
+    relation editor: user | service | group#member
+    relation viewer: user | service | group#member | user:*
+}
+
+// =========================
+// PERMISSIONS
+// =========================
+    permission read = owner + editor + viewer + parent->read
+    permission write = owner + editor + parent->write
+    permission delete = owner
+    permission share = owner + editor
+
+    // =========================
+    // Used by services
+    // =========================
+    permission list = read
+    permission create = write
+}

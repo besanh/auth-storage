@@ -1,0 +1,66 @@
+services:
+  timescale:
+    container_name: auth-storage-timescale
+    image: timescale/timescaledb-ha:pg18.1-ts2.24.0
+    command: >
+      postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
+    environment:
+      POSTGRES_USER: "anhle"
+      POSTGRES_PASSWORD: "anhle"
+      POSTGRES_DB: "auth_storage"
+      TZ: "UTC"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/postgres_data:/home/postgres/pgdata/data
+    networks:
+      - auth-storage-network
+
+  migrate:
+    build:
+      context: .
+      dockerfile: migrate.Dockerfile
+    environment:
+      - DB_URL=postgres://anhle:anhle@auth-storage-timescale:5432/auth_storage?sslmode=disable
+    volumes:
+      - ./internal/data/db/migrations/sql:/migrations/sql
+    command: ["-path", "/migrations/sql", "up"]
+    depends_on:
+      - timescale
+    networks:
+      - auth-storage-network
+
+  spicedb:
+    image: authzed/spicedb:latest
+    container_name: auth-storage-spicedb
+    command: ["serve", "--datastore-engine=memory"]
+    ports:
+      - "50051:50051" # gRPC
+      - "8443:8443" # HTTP (optional)
+    environment:
+      - SPICE_DB_DEBUG_LOG_LEVEL=debug
+      - SPICEDB_GRPC_PRESHARED_KEY=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4=
+    networks:
+      - auth-storage-network
+    # 1. Added Healthcheck: The init script needs to know when gRPC is actually ready
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:50051"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  spicedb-init:
+    image: authzed/zed:latest
+    container_name: auth-storage-spicedb-init
+    networks:
+      - auth-storage-network
+    depends_on:
+      spicedb:
+        condition: service_healthy
+    volumes:
+      - ./internal/data/db/migrations/spicedb/schema.zed:/app/schema.zed:ro
+    command: schema write /app/schema.zed --endpoint=spicedb:50051 --token=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4= --insecure
+
+networks:
+  auth-storage-network:
+    driver: bridge
