@@ -8,7 +8,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -60,8 +59,8 @@ INSERT INTO users (
     $1,
     $2,
     $3,
-    $4,
-    $5
+    now(),
+    $4
 ) RETURNING id, email, password_hash, status, created_at, updated_at
 `
 
@@ -69,7 +68,6 @@ type InsertUserParams struct {
 	Email        sql.NullString `json:"email"`
 	PasswordHash sql.NullString `json:"password_hash"`
 	Status       sql.NullString `json:"status"`
-	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
 }
 
@@ -78,7 +76,6 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		arg.Email,
 		arg.PasswordHash,
 		arg.Status,
-		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
 	var i User
@@ -97,7 +94,7 @@ const updatePasswordHash = `-- name: UpdatePasswordHash :one
 UPDATE users
 SET
     password_hash = $2,
-    updated_at = $3
+    updated_at = now()
 WHERE id = $1
 RETURNING id, email, password_hash, status, created_at, updated_at
 `
@@ -105,11 +102,10 @@ RETURNING id, email, password_hash, status, created_at, updated_at
 type UpdatePasswordHashParams struct {
 	ID           uuid.UUID      `json:"id"`
 	PasswordHash sql.NullString `json:"password_hash"`
-	UpdatedAt    sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) UpdatePasswordHash(ctx context.Context, arg UpdatePasswordHashParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updatePasswordHash, arg.ID, arg.PasswordHash, arg.UpdatedAt)
+	row := q.db.QueryRowContext(ctx, updatePasswordHash, arg.ID, arg.PasswordHash)
 	var i User
 	err := row.Scan(
 		&i.ID,

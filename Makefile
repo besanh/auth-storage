@@ -49,7 +49,7 @@ api:
  	       --go_out=paths=source_relative:./api \
  	       --go-http_out=paths=source_relative:./api \
  	       --go-grpc_out=paths=source_relative:./api \
-	       --openapi_out=fq_schema_naming=true,default_response=false:. \
+	       --openapi_out=fq_schema_naming=true,default_response=false:./docs \
 	       $(API_PROTO_FILES)
 
 .PHONY: build
@@ -148,7 +148,19 @@ docker-push: docker-build docker-login
 	@$(DOCKER) push $(IMAGE_NAME):$(IMAGE_TAG)
 
 key-pair:
-	# Generate private key
-	openssl genpkey -algorithm RSA -out ./cert/private_key.pem -pkeyopt rsa_keygen_bits:2048
-	# Generate public key
-	openssl rsa -pubout -in ./cert/private_key.pem -out ./cert/public_key.pem
+	@mkdir -p ./cert
+	@KID="$$(openssl rand -hex 16)"; \
+	echo "Generating RSA key pair for $$KID..."; \
+	openssl genpkey -algorithm RSA -out ./cert/$$KID-private.pem -pkeyopt rsa_keygen_bits:2048 2>/dev/null; \
+	openssl rsa -pubout -in ./cert/$$KID-private.pem -out ./cert/$$KID-public.pem 2>/dev/null; \
+	echo $$KID > ./cert/active_kid.txt; \
+	echo "✅ Keys generated! Check the ./cert directory."; \
+	echo "🔑 Active pointer updated to: $$KID"
+
+clear-key-pair:
+	@rm ./cert/*
+
+.PHONY: swagger
+swagger:
+	@$(DOCKER_COMPOSE_BIN) up swagger-ui -d
+	@echo "Swagger UI is running at http://localhost:8080"

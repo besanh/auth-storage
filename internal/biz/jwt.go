@@ -29,8 +29,11 @@ func (uc *AuthUseCase) GenerateToken(userID string) (string, string, int64, erro
 		ExpiresAt: jwt.NewNumericDate(now.Add(AccessTokenTTL)),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ID:        uuid.New().String(),
+		Audience:  []string{"auth-service"},
 	}
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims).SignedString(uc.privateKey)
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims)
+	accessToken.Header["kid"] = uc.conf.Kid
+	signedAccess, err := accessToken.SignedString(uc.privateKey)
 	if err != nil {
 		return "", "", 0, err
 	}
@@ -42,11 +45,14 @@ func (uc *AuthUseCase) GenerateToken(userID string) (string, string, int64, erro
 		ExpiresAt: jwt.NewNumericDate(now.Add(RefreshTokenTTL)),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ID:        uuid.New().String(),
+		Audience:  []string{"auth-service"},
 	}
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims).SignedString(uc.privateKey)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims)
+	refreshToken.Header["kid"] = uc.conf.Kid
+	signedRefresh, err := refreshToken.SignedString(uc.privateKey)
 	if err != nil {
 		return "", "", 0, err
 	}
 
-	return accessToken, refreshToken, int64(AccessTokenTTL.Seconds()), nil
+	return signedAccess, signedRefresh, accessClaims.ExpiresAt.Time.Unix(), nil
 }

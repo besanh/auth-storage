@@ -32,12 +32,12 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	greeterUsecase := biz.NewGreeterUsecase(greeterRepo)
 	greeterService := service.NewGreeterService(greeterUsecase)
 	authRepo := data.NewUserRepo(dataData, logger)
-	privatePEM, err := data.NewPrivatePEM()
+	privatePEM, err := data.NewPrivatePEM(confServer)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	publicPEM, err := data.NewPublicPEM()
+	publicPEM, err := data.NewPublicPEM(confServer)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -47,7 +47,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 		cleanup()
 		return nil, nil, err
 	}
-	authUseCase, err := biz.NewAuthUseCase(authRepo, privatePEM, publicPEM, spiceClient)
+	authUseCase, err := biz.NewAuthUseCase(authRepo, privatePEM, publicPEM, spiceClient, confServer)
 	if err != nil {
 		cleanup()
 		return nil, nil, err

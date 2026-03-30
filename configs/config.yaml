@@ -5,6 +5,7 @@ server:
   grpc:
     addr: 0.0.0.0:9000
     timeout: 1s
+  kid: 484a19bafc6671c073a97b6bd31f069e
 data:
   database:
     enable: true
@@ -12,9 +13,11 @@ data:
     source: postgres://anhle:anhle@localhost:5432/auth_storage?sslmode=disable
   redis:
     enable: true
-    addr: 127.0.0.1:6379
+    addr: localhost:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+    password: "anhle"
+    db: 0
   spicedb:
     enable: true
     endpoint: localhost:50051

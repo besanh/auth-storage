@@ -43,6 +43,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/auth.v1.LoginReply'
+    /v1/auth/logout:
+        post:
+            tags:
+                - Auth
+            operationId: Auth_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/auth.v1.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/auth.v1.LogoutReply'
+    /v1/auth/refresh-token:
+        post:
+            tags:
+                - Auth
+            operationId: Auth_RefreshToken
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/auth.v1.RefreshTokenRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/auth.v1.RefreshTokenReply'
     /v1/auth/register:
         post:
             tags:
@@ -81,7 +117,17 @@ components:
                     type: string
                 password:
                     type: string
-        auth.v1.RegisterReply:
+        auth.v1.LogoutReply:
+            type: object
+            properties:
+                message:
+                    type: string
+        auth.v1.LogoutRequest:
+            type: object
+            properties:
+                refreshToken:
+                    type: string
+        auth.v1.RefreshTokenReply:
             type: object
             properties:
                 accessToken:
@@ -90,6 +136,16 @@ components:
                     type: string
                 expiresIn:
                     type: string
+                userId:
+                    type: string
+        auth.v1.RefreshTokenRequest:
+            type: object
+            properties:
+                refreshToken:
+                    type: string
+        auth.v1.RegisterReply:
+            type: object
+            properties:
                 userId:
                     type: string
         auth.v1.RegisterRequest:

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -28,14 +29,16 @@ func certDir() string {
 	return filepath.Join(root, "cert")
 }
 
-// NewPrivatePEM reads the RSA private key PEM from cert/private_key.pem.
-func NewPrivatePEM() (biz.PrivatePEM, error) {
-	data, err := os.ReadFile(filepath.Join(certDir(), "private_key.pem"))
+// NewPrivatePEM reads the RSA private key PEM from cert/<kid>-private.pem.
+func NewPrivatePEM(c *conf.Server) (biz.PrivatePEM, error) {
+	filename := fmt.Sprintf("%s-private.pem", c.Kid)
+	data, err := os.ReadFile(filepath.Join(certDir(), filename))
 	return biz.PrivatePEM(data), err
 }
 
-// NewPublicPEM reads the RSA public key PEM from cert/public_key.pem.
-func NewPublicPEM() (biz.PublicPEM, error) {
-	data, err := os.ReadFile(filepath.Join(certDir(), "public_key.pem"))
+// NewPublicPEM reads the RSA public key PEM from cert/<kid>-public.pem.
+func NewPublicPEM(c *conf.Server) (biz.PublicPEM, error) {
+	filename := fmt.Sprintf("%s-public.pem", c.Kid)
+	data, err := os.ReadFile(filepath.Join(certDir(), filename))
 	return biz.PublicPEM(data), err
 }

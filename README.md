@@ -1,3 +1,19 @@
+# Auth Storage Server
+
+## Documentation
+Comprehensive documentation is available in the [docs/](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs) folder:
+- [Architecture Overview](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/architecture.md)
+- [Sequence Flows](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/flows.md)
+- [OpenAPI Specification](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/openapi.yaml)
+
+You can view the API documents visually by running:
+```bash
+make swagger
+```
+Then navigate to http://localhost:8080.
+
+---
+
 # Kratos Project Template
 
 ## Install Kratos

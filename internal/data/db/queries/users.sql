@@ -9,8 +9,8 @@ INSERT INTO users (
     $1,
     $2,
     $3,
-    $4,
-    $5
+    now(),
+    $4
 ) RETURNING *;
 
 -- name: GetUserByEmail :one
@@ -20,7 +20,7 @@ SELECT * FROM users WHERE email = $1;
 UPDATE users
 SET
     password_hash = $2,
-    updated_at = $3
+    updated_at = now()
 WHERE id = $1
 RETURNING *;
 

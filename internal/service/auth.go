@@ -18,15 +18,12 @@ func NewAuthService(uc *biz.AuthUseCase) *AuthService {
 }
 
 func (s *AuthService) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.RegisterReply, error) {
-	accessToken, refreshToken, expiresIn, userId, err := s.uc.Register(ctx, req.Email, req.Password)
+	userId, err := s.uc.Register(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
 	return &v1.RegisterReply{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		ExpiresIn:    expiresIn,
-		UserId:       userId,
+		UserId: userId,
 	}, nil
 }
 
@@ -41,4 +38,25 @@ func (s *AuthService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Logi
 		ExpiresIn:    expiresIn,
 		UserId:       userId,
 	}, nil
+}
+
+func (s *AuthService) RefreshToken(ctx context.Context, req *v1.RefreshTokenRequest) (*v1.RefreshTokenReply, error) {
+	accessToken, refreshToken, expiresIn, userId, err := s.uc.RefreshToken(ctx, req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.RefreshTokenReply{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpiresIn:    expiresIn,
+		UserId:       userId,
+	}, nil
+}
+
+func (s *AuthService) Logout(ctx context.Context, req *v1.LogoutRequest) (*v1.LogoutReply, error) {
+	err := s.uc.Logout(ctx, req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.LogoutReply{}, nil
 }

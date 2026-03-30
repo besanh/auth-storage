@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"server/internal/conf"
@@ -12,6 +13,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -25,6 +27,7 @@ type Data struct {
 	DB      *sql.DB
 	Query   *db.Queries
 	SpiceDB *authzed.Client
+	Redis   *redis.Client
 }
 
 // NewData .
@@ -65,15 +68,34 @@ func NewData(c *conf.Data) (*Data, func(), error) {
 		return nil, nil, fmt.Errorf("failed to connect to spicedb: %w", err)
 	}
 
+	// Redis
+	rdb := redis.NewClient(&redis.Options{
+		Addr:         c.Redis.Addr,
+		Password:     c.Redis.Password,
+		DB:           int(c.Redis.Db),
+		ReadTimeout:  c.Redis.ReadTimeout.AsDuration(),
+		WriteTimeout: c.Redis.WriteTimeout.AsDuration(),
+	})
+
+	// Check Redis connection
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := rdb.Ping(ctx).Err(); err != nil {
+		return nil, nil, fmt.Errorf("failed to connect to redis: %w", err)
+	}
+
 	cleanup := func() {
 		log.Info("closing the data resources")
 		_ = dbConn.Close()
 		_ = client.Close()
+		rdb.Close()
 	}
 
 	return &Data{
 		DB:      dbConn,
 		Query:   db.New(dbConn),
 		SpiceDB: client,
+		Redis:   rdb,
 	}, cleanup, nil
 }

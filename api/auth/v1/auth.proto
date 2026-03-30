@@ -7,7 +7,7 @@ option go_package = "auth_storage/api/auth/v1";
 import "google/api/annotations.proto";
 
 service Auth {
-    rpc Register(RegisterRequest) returns (RegisterReply) {
+    rpc Register (RegisterRequest) returns (RegisterReply) {
         option (google.api.http) = {
         post: "/v1/auth/register"
         body: "*"
@@ -19,6 +19,18 @@ service Auth {
         body: "*"
         };
     }
+    rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenReply) {
+        option (google.api.http) = {
+        post: "/v1/auth/refresh-token"
+        body: "*"
+        };
+    }
+    rpc Logout (LogoutRequest) returns (LogoutReply) {
+        option (google.api.http) = {
+        post: "/v1/auth/logout"
+        body: "*"
+        };
+    }
 }
 
 message RegisterRequest {
@@ -27,10 +39,7 @@ message RegisterRequest {
 }
 
 message RegisterReply {
-    string access_token = 1;
-    string refresh_token = 2;
-    int64 expires_in = 3;
-    string user_id = 4;
+    string user_id = 1;
 }
 
 message LoginRequest {
@@ -43,4 +52,23 @@ message LoginReply {
     string refresh_token = 2;
     int64 expires_in = 3;
     string user_id = 4;
+}
+
+message RefreshTokenRequest {
+    string refresh_token = 1;
+}
+
+message RefreshTokenReply {
+    string access_token = 1;
+    string refresh_token = 2;
+    int64 expires_in = 3;
+    string user_id = 4;
+}
+
+message LogoutRequest {
+    string refresh_token = 1;
+}
+
+message LogoutReply {
+    string message = 1;
 }

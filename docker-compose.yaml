@@ -16,6 +16,19 @@ services:
     networks:
       - auth-storage-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: auth-storage-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass", "anhle"]
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./tmp/redis_data:/data
+    networks:
+      - auth-storage-network
+
   migrate:
     build:
       context: .
@@ -60,6 +73,18 @@ services:
     volumes:
       - ./internal/data/db/migrations/spicedb/schema.zed:/app/schema.zed:ro
     command: schema write /app/schema.zed --endpoint=spicedb:50051 --token=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4= --insecure
+
+  # swagger-ui:
+  #   image: swaggerapi/swagger-ui
+  #   container_name: auth-storage-swagger-ui
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SWAGGER_JSON: /app/openapi.yaml
+  #   volumes:
+  #     - ./docs/openapi.yaml:/app/openapi.yaml
+  #   networks:
+  #     - auth-storage-network
 
 networks:
   auth-storage-network:
