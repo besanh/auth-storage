@@ -10,7 +10,7 @@ data:
   database:
     enable: true
     driver: pgx
-    source: postgres://anhle:anhle@localhost:5432/auth_storage?sslmode=disable
+    source: postgres://anhle:anhle@localhost:54320/auth_storage?sslmode=disable
   redis:
     enable: true
     addr: localhost:6379

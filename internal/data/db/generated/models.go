@@ -11,6 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type MachineClient struct {
+	ClientID         string       `json:"client_id"`
+	ClientSecretHash string       `json:"client_secret_hash"`
+	Name             string       `json:"name"`
+	Scopes           []string     `json:"scopes"`
+	CreatedAt        time.Time    `json:"created_at"`
+	UpdatedAt        sql.NullTime `json:"updated_at"`
+}
+
 type User struct {
 	ID           uuid.UUID      `json:"id"`
 	Email        sql.NullString `json:"email"`

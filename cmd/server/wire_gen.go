@@ -53,8 +53,15 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 		return nil, nil, err
 	}
 	authService := service.NewAuthService(authUseCase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger, authService)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger, authService)
+	m2MAuthRepo := data.NewM2MAuthRepo(dataData, logger)
+	m2MAuthUseCase, err := biz.NewM2MAuthUseCase(m2MAuthRepo, privatePEM, confServer, logger)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	m2MAuthService := service.NewM2MAuthService(m2MAuthUseCase, logger)
+	grpcServer := server.NewGRPCServer(confServer, greeterService, logger, authService, m2MAuthService)
+	httpServer := server.NewHTTPServer(confServer, greeterService, logger, authService, m2MAuthService)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

@@ -3,6 +3,7 @@ package server
 import (
 	authV1 "server/api/auth/v1"
 	v1 "server/api/helloworld/v1"
+	m2mV1 "server/api/m2m_auth/v1"
 	"server/internal/conf"
 	"server/internal/service"
 
@@ -12,7 +13,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger, auth *service.AuthService) *http.Server {
+func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger, auth *service.AuthService, m2mAuth *service.M2MAuthService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -30,5 +31,6 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 	srv := http.NewServer(opts...)
 	v1.RegisterGreeterHTTPServer(srv, greeter)
 	authV1.RegisterAuthHTTPServer(srv, auth)
+	m2mV1.RegisterAuthHTTPServer(srv, m2mAuth)
 	return srv
 }

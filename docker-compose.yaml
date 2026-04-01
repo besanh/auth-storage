@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: "auth_storage"
       TZ: "UTC"
     ports:
-      - "5432:5432"
+      - "54320:5432"
     volumes:
       - ./tmp/postgres_data:/home/postgres/pgdata/data
     networks:
@@ -30,6 +30,7 @@ services:
       - auth-storage-network
 
   migrate:
+    container_name: auth-storage-migrate
     build:
       context: .
       dockerfile: migrate.Dockerfile
@@ -73,6 +74,24 @@ services:
     volumes:
       - ./internal/data/db/migrations/spicedb/schema.zed:/app/schema.zed:ro
     command: schema write /app/schema.zed --endpoint=spicedb:50051 --token=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4= --insecure
+
+  hashicorp:
+    image: hashicorp/vault:latest
+    container_name: auth-storage-hashicorp
+    ports:
+      - "8200:8200"
+    environment:
+      # These now pull directly from your .env file
+      VAULT_DEV_ROOT_TOKEN_ID: "${VAULT_DEV_ROOT_TOKEN_ID}"
+      VAULT_ADDR: "${VAULT_ADDR}"
+      VAULT_UI: "true"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./tmp/vault_data:/vault/file
+    restart: always
+    networks:
+      - auth-storage-network
 
   # swagger-ui:
   #   image: swaggerapi/swagger-ui

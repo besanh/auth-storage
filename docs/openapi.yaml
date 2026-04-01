@@ -25,6 +25,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/helloworld.v1.HelloReply'
+    /m2m/v1/auth/login:
+        post:
+            tags:
+                - Auth
+            operationId: Auth_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/m2m_auth.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/m2m_auth.v1.LoginReply'
     /v1/auth/login:
         post:
             tags:
@@ -161,7 +179,22 @@ components:
                 message:
                     type: string
             description: The response message containing the greetings
+        m2m_auth.v1.LoginReply:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                expiresIn:
+                    type: string
+        m2m_auth.v1.LoginRequest:
+            type: object
+            properties:
+                clientId:
+                    type: string
+                clientSecret:
+                    type: string
 tags:
+    - name: Auth
     - name: Auth
     - name: Greeter
       description: The greeting service definition.

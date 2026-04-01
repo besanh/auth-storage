@@ -164,3 +164,40 @@ clear-key-pair:
 swagger:
 	@$(DOCKER_COMPOSE_BIN) up swagger-ui -d
 	@echo "Swagger UI is running at http://localhost:8080"
+
+.PHONY: vault-up
+vault-up:
+	@echo "Generating fresh Root Token..."
+	@$(eval DEV_TOKEN := $(shell openssl rand -hex 16))
+	@echo "VAULT_DEV_ROOT_TOKEN_ID=$(DEV_TOKEN)" > .vault.env
+	@echo "VAULT_ADDR=http://0.0.0.0:8200" >> .vault.env
+	@echo "--------------------------------------------------"
+	@echo "🚀 Starting Vault with Root Token: $(DEV_TOKEN)"
+	@echo "--------------------------------------------------"
+	@docker-compose --env-file .vault.env up -d
+
+.PHONY: init-vault
+init-vault:
+	@echo "Checking Vault KV-V2 Secrets Engine..."
+	@# Load the token from .env
+	@export $$(grep -v '^#' .env | xargs) && \
+	if docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp vault secrets list | grep -q "^secret/"; then \
+		echo "✅ Vault is already initialized at /secret. Skipping."; \
+	else \
+		echo "Initializing Vault KV-V2..."; \
+		docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 \
+		auth-storage-hashicorp vault secrets enable -path=secret kv-v2 && \
+		echo "✅ Vault successfully initialized."; \
+	fi
+
+.PHONY: create-m2m-vault
+create-m2m-vault:
+	@if [ -z "$(id)" ] || [ -z "$(name)" ]; then \
+		echo "❌ Error: Missing required arguments."; \
+		echo "Usage: make create-m2m-vault id=\"service-id\" name=\"Service Name\""; \
+		exit 1; \
+	fi
+	@echo "Generating credentials and pushing to Vault..."
+	@# Load the token from the standard .env file we created
+	@export $$(grep -v '^#' .env | xargs) && \
+	 go run scripts/create_m2m_client.go -id "$(id)" -name "$(name)" -vault

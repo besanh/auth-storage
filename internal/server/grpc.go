@@ -3,6 +3,7 @@ package server
 import (
 	authV1 "server/api/auth/v1"
 	v1 "server/api/helloworld/v1"
+	m2mV1 "server/api/m2m_auth/v1"
 	"server/internal/conf"
 	"server/internal/service"
 
@@ -12,7 +13,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger, auth *service.AuthService) *grpc.Server {
+func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger, auth *service.AuthService, m2mAuth *service.M2MAuthService) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -30,5 +31,6 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 	srv := grpc.NewServer(opts...)
 	v1.RegisterGreeterServer(srv, greeter)
 	authV1.RegisterAuthServer(srv, auth)
+	m2mV1.RegisterAuthServer(srv, m2mAuth)
 	return srv
 }

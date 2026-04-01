@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package m2m_auth.v1;
+
+option go_package = "auth_storage/api/m2m_auth/v1";
+
+import "google/api/annotations.proto";
+
+service Auth {
+    rpc Login (LoginRequest) returns (LoginReply) {
+        option (google.api.http) = {
+        post: "/m2m/v1/auth/login"
+        body: "*"
+        };
+    }
+}
+
+message LoginRequest {
+    string client_id = 1;
+    string client_secret = 2;
+}
+
+message LoginReply {
+    string access_token = 1;
+    int64 expires_in = 2;
+}
