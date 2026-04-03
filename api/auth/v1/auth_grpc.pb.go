@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_Register_FullMethodName     = "/auth.v1.Auth/Register"
-	Auth_Login_FullMethodName        = "/auth.v1.Auth/Login"
-	Auth_RefreshToken_FullMethodName = "/auth.v1.Auth/RefreshToken"
-	Auth_Logout_FullMethodName       = "/auth.v1.Auth/Logout"
+	Auth_Register_FullMethodName        = "/auth.v1.Auth/Register"
+	Auth_Login_FullMethodName           = "/auth.v1.Auth/Login"
+	Auth_RefreshToken_FullMethodName    = "/auth.v1.Auth/RefreshToken"
+	Auth_Logout_FullMethodName          = "/auth.v1.Auth/Logout"
+	Auth_CheckPermission_FullMethodName = "/auth.v1.Auth/CheckPermission"
 )
 
 // AuthClient is the client API for Auth service.
@@ -33,6 +34,7 @@ type AuthClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenReply, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutReply, error)
+	CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionReply, error)
 }
 
 type authClient struct {
@@ -83,6 +85,16 @@ func (c *authClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *authClient) CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckPermissionReply)
+	err := c.cc.Invoke(ctx, Auth_CheckPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type AuthServer interface {
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenReply, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutReply, error)
+	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedAuthServer) RefreshToken(context.Context, *RefreshTokenReques
 }
 func (UnimplementedAuthServer) Logout(context.Context, *LogoutRequest) (*LogoutReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedAuthServer) CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckPermission not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 func (UnimplementedAuthServer) testEmbeddedByValue()              {}
@@ -206,6 +222,24 @@ func _Auth_Logout_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_CheckPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).CheckPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_CheckPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).CheckPermission(ctx, req.(*CheckPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _Auth_Logout_Handler,
+		},
+		{
+			MethodName: "CheckPermission",
+			Handler:    _Auth_CheckPermission_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -73,11 +73,13 @@ func (uc *AuthUseCase) Register(ctx context.Context, email, password string) (st
 
 	var user *db.User
 	// 2 & 3. Save to database and Provision user in SpiceDB within a transaction
-	err = uc.authRepo.ExecTx(ctx, func(repo AuthRepo) error {
+	if err = uc.authRepo.ExecTx(ctx, func(repo AuthRepo) error {
 		var err error
 		user, err = repo.InsertUser(ctx, &db.User{
 			Email:        sql.NullString{String: email, Valid: true},
 			PasswordHash: sql.NullString{String: string(hash), Valid: true},
+			Role:         "user",
+			Scope:        "",
 		})
 		if err != nil {
 			return err
@@ -105,9 +107,7 @@ func (uc *AuthUseCase) Register(ctx context.Context, email, password string) (st
 		}
 
 		return nil
-	})
-
-	if err != nil {
+	}); err != nil {
 		return "", err
 	}
 
@@ -127,7 +127,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, email, password string) (strin
 	}
 
 	// 3. Generate JWT tokens
-	accessToken, refreshToken, expiresIn, err := uc.GenerateToken(user.ID.String())
+	accessToken, refreshToken, expiresIn, err := uc.GenerateToken(user.ID.String(), user.Role, user.Scope)
 	if err != nil {
 		return "", "", 0, "", err
 	}
@@ -136,7 +136,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, email, password string) (strin
 
 func (uc *AuthUseCase) RefreshToken(ctx context.Context, refreshToken string) (string, string, int64, string, error) {
 	// 1. Validate the refresh token
-	claims := &jwt.RegisteredClaims{}
+	claims := &CustomClaims{}
 	token, err := jwt.ParseWithClaims(refreshToken, claims, func(t *jwt.Token) (any, error) {
 		// 1. Verify it's actually an RSA signed token
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
@@ -177,7 +177,7 @@ func (uc *AuthUseCase) RefreshToken(ctx context.Context, refreshToken string) (s
 	}
 
 	// 5. Generate a brand new Access Token and a brand new Refresh Token (Token Rotation)
-	accessToken, refreshToken, expiresIn, err := uc.GenerateToken(user.ID.String())
+	accessToken, refreshToken, expiresIn, err := uc.GenerateToken(user.ID.String(), user.Role, user.Scope)
 	if err != nil {
 		return "", "", 0, "", err
 	}
@@ -187,7 +187,7 @@ func (uc *AuthUseCase) RefreshToken(ctx context.Context, refreshToken string) (s
 func (uc *AuthUseCase) Logout(ctx context.Context, tokenString string) error {
 	// 1. Parse the token (We don't need to verify the signature here
 	// if your Middleware already verified it, but we parse it to get the claims)
-	claims := &jwt.RegisteredClaims{}
+	claims := &CustomClaims{}
 	parser := jwt.NewParser() // Use an unverified parser just to read the claims safely
 
 	_, _, err := parser.ParseUnverified(tokenString, claims)
@@ -216,4 +216,21 @@ func (uc *AuthUseCase) Logout(ctx context.Context, tokenString string) error {
 	}
 
 	return nil
+}
+
+func (uc *AuthUseCase) CheckPermission(ctx context.Context, subjectType, subjectID, relation, objectType, objectID string) (bool, error) {
+	request := &pb.CheckPermissionRequest{
+		Resource:   &pb.ObjectReference{ObjectType: objectType, ObjectId: objectID},
+		Permission: relation,
+		Subject: &pb.SubjectReference{
+			Object: &pb.ObjectReference{ObjectType: subjectType, ObjectId: subjectID},
+		},
+	}
+
+	resp, err := uc.spiceClient.Client.PermissionsServiceClient.CheckPermission(ctx, request)
+	if err != nil {
+		return false, fmt.Errorf("failed to check permission in spicedb: %w", err)
+	}
+
+	return resp.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_HAS_PERMISSION, nil
 }

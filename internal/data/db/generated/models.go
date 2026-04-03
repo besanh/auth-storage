@@ -24,6 +24,8 @@ type User struct {
 	ID           uuid.UUID      `json:"id"`
 	Email        sql.NullString `json:"email"`
 	PasswordHash sql.NullString `json:"password_hash"`
+	Role         string         `json:"role"`
+	Scope        string         `json:"scope"`
 	Status       sql.NullString `json:"status"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`

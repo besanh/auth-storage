@@ -19,12 +19,14 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationAuthCheckPermission = "/auth.v1.Auth/CheckPermission"
 const OperationAuthLogin = "/auth.v1.Auth/Login"
 const OperationAuthLogout = "/auth.v1.Auth/Logout"
 const OperationAuthRefreshToken = "/auth.v1.Auth/RefreshToken"
 const OperationAuthRegister = "/auth.v1.Auth/Register"
 
 type AuthHTTPServer interface {
+	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutReply, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenReply, error)
@@ -37,6 +39,7 @@ func RegisterAuthHTTPServer(s *http.Server, srv AuthHTTPServer) {
 	r.POST("/v1/auth/login", _Auth_Login1_HTTP_Handler(srv))
 	r.POST("/v1/auth/refresh-token", _Auth_RefreshToken0_HTTP_Handler(srv))
 	r.POST("/v1/auth/logout", _Auth_Logout0_HTTP_Handler(srv))
+	r.POST("/v1/auth/check", _Auth_CheckPermission0_HTTP_Handler(srv))
 }
 
 func _Auth_Register0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
@@ -127,7 +130,30 @@ func _Auth_Logout0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error
 	}
 }
 
+func _Auth_CheckPermission0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CheckPermissionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthCheckPermission)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CheckPermission(ctx, req.(*CheckPermissionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CheckPermissionReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AuthHTTPClient interface {
+	CheckPermission(ctx context.Context, req *CheckPermissionRequest, opts ...http.CallOption) (rsp *CheckPermissionReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutReply, err error)
 	RefreshToken(ctx context.Context, req *RefreshTokenRequest, opts ...http.CallOption) (rsp *RefreshTokenReply, err error)
@@ -140,6 +166,19 @@ type AuthHTTPClientImpl struct {
 
 func NewAuthHTTPClient(client *http.Client) AuthHTTPClient {
 	return &AuthHTTPClientImpl{client}
+}
+
+func (c *AuthHTTPClientImpl) CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...http.CallOption) (*CheckPermissionReply, error) {
+	var out CheckPermissionReply
+	pattern := "/v1/auth/check"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAuthCheckPermission))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *AuthHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {

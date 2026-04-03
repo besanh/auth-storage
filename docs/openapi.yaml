@@ -43,6 +43,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/m2m_auth.v1.LoginReply'
+    /v1/auth/check:
+        post:
+            tags:
+                - Auth
+            operationId: Auth_CheckPermission
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/auth.v1.CheckPermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/auth.v1.CheckPermissionReply'
     /v1/auth/login:
         post:
             tags:
@@ -117,6 +135,24 @@ paths:
                                 $ref: '#/components/schemas/auth.v1.RegisterReply'
 components:
     schemas:
+        auth.v1.CheckPermissionReply:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+        auth.v1.CheckPermissionRequest:
+            type: object
+            properties:
+                subjectType:
+                    type: string
+                subjectId:
+                    type: string
+                relation:
+                    type: string
+                objectType:
+                    type: string
+                objectId:
+                    type: string
         auth.v1.LoginReply:
             type: object
             properties:

@@ -14,16 +14,14 @@ import (
 )
 
 type userRepo struct {
-	data  *Data
-	log   *log.Helper
-	query *db.Queries
+	data *Data
+	log  *log.Helper
 }
 
 func NewUserRepo(data *Data, logger log.Logger) biz.AuthRepo {
 	return &userRepo{
-		data:  data,
-		log:   log.NewHelper(logger),
-		query: data.Query,
+		data: data,
+		log:  log.NewHelper(logger),
 	}
 }
 
@@ -34,11 +32,9 @@ func (r *userRepo) ExecTx(ctx context.Context, fn func(biz.AuthRepo) error) erro
 	}
 	defer tx.Rollback()
 
-	q := db.New(tx)
 	err = fn(&userRepo{
-		data:  r.data,
-		log:   r.log,
-		query: q,
+		data: r.data,
+		log:  r.log,
 	})
 	if err != nil {
 		return err
@@ -48,9 +44,12 @@ func (r *userRepo) ExecTx(ctx context.Context, fn func(biz.AuthRepo) error) erro
 }
 
 func (r *userRepo) InsertUser(ctx context.Context, in *db.User) (*db.User, error) {
-	resp, err := r.query.InsertUser(ctx, db.InsertUserParams{
+	resp, err := r.data.Query.InsertUser(ctx, db.InsertUserParams{
 		Email:        in.Email,
 		PasswordHash: in.PasswordHash,
+		Role:         in.Role,
+		Scope:        in.Scope,
+		Status:       in.Status,
 	})
 	if err == sql.ErrNoRows {
 		return nil, biz.ErrUserNotFound
@@ -62,7 +61,7 @@ func (r *userRepo) InsertUser(ctx context.Context, in *db.User) (*db.User, error
 }
 
 func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*db.User, error) {
-	resp, err := r.query.GetUserByEmail(ctx, sql.NullString{String: email, Valid: true})
+	resp, err := r.data.Query.GetUserByEmail(ctx, sql.NullString{String: email, Valid: true})
 	if err == sql.ErrNoRows {
 		return nil, biz.ErrUserNotFound
 	}
@@ -73,7 +72,7 @@ func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*db.User, 
 }
 
 func (r *userRepo) UpdatePasswordHash(ctx context.Context, id string, passwordHash string) (*db.User, error) {
-	resp, err := r.query.UpdatePasswordHash(ctx, db.UpdatePasswordHashParams{
+	resp, err := r.data.Query.UpdatePasswordHash(ctx, db.UpdatePasswordHashParams{
 		ID:           uuid.Must(uuid.Parse(id)),
 		PasswordHash: sql.NullString{String: passwordHash, Valid: true},
 	})
@@ -87,7 +86,7 @@ func (r *userRepo) UpdatePasswordHash(ctx context.Context, id string, passwordHa
 }
 
 func (r *userRepo) GetUserByID(ctx context.Context, id string) (*db.User, error) {
-	resp, err := r.query.GetUserByID(ctx, uuid.Must(uuid.Parse(id)))
+	resp, err := r.data.Query.GetUserByID(ctx, uuid.Must(uuid.Parse(id)))
 	if err == sql.ErrNoRows {
 		return nil, biz.ErrUserNotFound
 	}

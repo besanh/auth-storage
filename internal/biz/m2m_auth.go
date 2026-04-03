@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -55,14 +56,19 @@ func (uc *M2MAuthUseCase) Login(ctx context.Context, clientID, clientSecret stri
 	// 3. Generate token
 	now := time.Now().UTC()
 	claims := jwt.MapClaims{
-		"sub":    client.ClientID,
-		"iss":    IssuerName,
-		"exp":    now.Add(AccessTokenTTL).Unix(),
-		"iat":    now.Unix(),
-		"jti":    uuid.New().String(),
-		"aud":    []string{"auth-service"},
-		"scopes": client.Scopes,
-		"type":   "m2m",
+		"sub":   client.ClientID,
+		"iss":   IssuerName,
+		"exp":   now.Add(AccessTokenTTL).Unix(),
+		"iat":   now.Unix(),
+		"jti":   uuid.New().String(),
+		"aud":   []string{"auth-service"},
+		"scope": strings.Join(client.Scopes, " "),
+		"role":  "service",
+		"type":  "m2m",
+		"spicedb": map[string]string{
+			"type": "client",
+			"id":   client.ClientID,
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)

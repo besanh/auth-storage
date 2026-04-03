@@ -13,7 +13,7 @@ import (
 )
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, status, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, password_hash, role, scope, status, created_at, updated_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email sql.NullString) (User, error) {
@@ -23,6 +23,8 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email sql.NullString) (Use
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
+		&i.Scope,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -31,7 +33,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email sql.NullString) (Use
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, password_hash, status, created_at, updated_at FROM users WHERE id = $1
+SELECT id, email, password_hash, role, scope, status, created_at, updated_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -41,6 +43,8 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
+		&i.Scope,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -53,21 +57,27 @@ INSERT INTO users (
     email,
     password_hash,
     status,
+    role,
+    scope,
     created_at,
     updated_at
 ) VALUES (
     $1,
     $2,
     $3,
+    $4,
+    $5,
     now(),
-    $4
-) RETURNING id, email, password_hash, status, created_at, updated_at
+    $6
+) RETURNING id, email, password_hash, role, scope, status, created_at, updated_at
 `
 
 type InsertUserParams struct {
 	Email        sql.NullString `json:"email"`
 	PasswordHash sql.NullString `json:"password_hash"`
 	Status       sql.NullString `json:"status"`
+	Role         string         `json:"role"`
+	Scope        string         `json:"scope"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
 }
 
@@ -76,6 +86,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		arg.Email,
 		arg.PasswordHash,
 		arg.Status,
+		arg.Role,
+		arg.Scope,
 		arg.UpdatedAt,
 	)
 	var i User
@@ -83,6 +95,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
+		&i.Scope,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -96,7 +110,7 @@ SET
     password_hash = $2,
     updated_at = now()
 WHERE id = $1
-RETURNING id, email, password_hash, status, created_at, updated_at
+RETURNING id, email, password_hash, role, scope, status, created_at, updated_at
 `
 
 type UpdatePasswordHashParams struct {
@@ -111,6 +125,8 @@ func (q *Queries) UpdatePasswordHash(ctx context.Context, arg UpdatePasswordHash
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
+		&i.Scope,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,

@@ -60,3 +60,14 @@ func (s *AuthService) Logout(ctx context.Context, req *v1.LogoutRequest) (*v1.Lo
 	}
 	return &v1.LogoutReply{}, nil
 }
+
+func (s *AuthService) CheckPermission(ctx context.Context, req *v1.CheckPermissionRequest) (*v1.CheckPermissionReply, error) {
+	allowed, err := s.uc.CheckPermission(ctx, req.SubjectType, req.SubjectId, req.Relation, req.ObjectType, req.ObjectId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CheckPermissionReply{
+		Allowed: allowed,
+	}, nil
+}

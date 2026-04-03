@@ -14,22 +14,42 @@ const (
 	IssuerName      = "auth-service"
 )
 
+type SpiceDBClaim struct {
+	Type string `json:"type"`
+	ID   string `json:"id"`
+}
+
+type CustomClaims struct {
+	Role    string       `json:"role,omitempty"`
+	Scope   string       `json:"scope,omitempty"`
+	SpiceDB SpiceDBClaim `json:"spicedb,omitzero"`
+	jwt.RegisteredClaims
+}
+
 var (
 	ErrUserAlreadyExists  = fmt.Errorf("user with this email already exists")
 	ErrInvalidCredentials = fmt.Errorf("invalid email or password")
 )
 
-func (uc *AuthUseCase) GenerateToken(userID string) (string, string, int64, error) {
+func (uc *AuthUseCase) GenerateToken(userID, role, scope string) (string, string, int64, error) {
 	now := time.Now().UTC()
 
 	// 1. Access Token
-	accessClaims := jwt.RegisteredClaims{
-		Subject:   userID,
-		Issuer:    IssuerName,
-		ExpiresAt: jwt.NewNumericDate(now.Add(AccessTokenTTL)),
-		IssuedAt:  jwt.NewNumericDate(now),
-		ID:        uuid.New().String(),
-		Audience:  []string{"auth-service"},
+	accessClaims := CustomClaims{
+		Role:  role,
+		Scope: scope,
+		SpiceDB: SpiceDBClaim{
+			Type: "user",
+			ID:   userID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   userID,
+			Issuer:    IssuerName,
+			ExpiresAt: jwt.NewNumericDate(now.Add(AccessTokenTTL)),
+			IssuedAt:  jwt.NewNumericDate(now),
+			ID:        uuid.New().String(),
+			Audience:  []string{"auth-service"},
+		},
 	}
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims)
 	accessToken.Header["kid"] = uc.conf.Kid
@@ -39,13 +59,21 @@ func (uc *AuthUseCase) GenerateToken(userID string) (string, string, int64, erro
 	}
 
 	// 2. Refresh Token
-	refreshClaims := jwt.RegisteredClaims{
-		Subject:   userID,
-		Issuer:    IssuerName,
-		ExpiresAt: jwt.NewNumericDate(now.Add(RefreshTokenTTL)),
-		IssuedAt:  jwt.NewNumericDate(now),
-		ID:        uuid.New().String(),
-		Audience:  []string{"auth-service"},
+	refreshClaims := CustomClaims{
+		Role:  role,
+		Scope: scope,
+		SpiceDB: SpiceDBClaim{
+			Type: "user",
+			ID:   userID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   userID,
+			Issuer:    IssuerName,
+			ExpiresAt: jwt.NewNumericDate(now.Add(RefreshTokenTTL)),
+			IssuedAt:  jwt.NewNumericDate(now),
+			ID:        uuid.New().String(),
+			Audience:  []string{"auth-service"},
+		},
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims)
 	refreshToken.Header["kid"] = uc.conf.Kid

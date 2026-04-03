@@ -3,14 +3,18 @@ INSERT INTO users (
     email,
     password_hash,
     status,
+    role,
+    scope,
     created_at,
     updated_at
 ) VALUES (
     $1,
     $2,
     $3,
+    $4,
+    $5,
     now(),
-    $4
+    $6
 ) RETURNING *;
 
 -- name: GetUserByEmail :one

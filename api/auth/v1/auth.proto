@@ -31,6 +31,12 @@ service Auth {
         body: "*"
         };
     }
+    rpc CheckPermission (CheckPermissionRequest) returns (CheckPermissionReply) {
+        option (google.api.http) = {
+        post: "/v1/auth/check"
+        body: "*"
+        };
+    }
 }
 
 message RegisterRequest {
@@ -71,4 +77,16 @@ message LogoutRequest {
 
 message LogoutReply {
     string message = 1;
+}
+
+message CheckPermissionRequest {
+    string subject_type = 1;
+    string subject_id = 2;
+    string relation = 3;
+    string object_type = 4;
+    string object_id = 5;
+}
+
+message CheckPermissionReply {
+    bool allowed = 1;
 }

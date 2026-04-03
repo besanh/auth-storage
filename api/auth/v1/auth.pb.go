@@ -438,6 +438,126 @@ func (x *LogoutReply) GetMessage() string {
 	return ""
 }
 
+type CheckPermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SubjectType   string                 `protobuf:"bytes,1,opt,name=subject_type,json=subjectType,proto3" json:"subject_type,omitempty"`
+	SubjectId     string                 `protobuf:"bytes,2,opt,name=subject_id,json=subjectId,proto3" json:"subject_id,omitempty"`
+	Relation      string                 `protobuf:"bytes,3,opt,name=relation,proto3" json:"relation,omitempty"`
+	ObjectType    string                 `protobuf:"bytes,4,opt,name=object_type,json=objectType,proto3" json:"object_type,omitempty"`
+	ObjectId      string                 `protobuf:"bytes,5,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckPermissionRequest) Reset() {
+	*x = CheckPermissionRequest{}
+	mi := &file_auth_v1_auth_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckPermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckPermissionRequest) ProtoMessage() {}
+
+func (x *CheckPermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_v1_auth_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckPermissionRequest.ProtoReflect.Descriptor instead.
+func (*CheckPermissionRequest) Descriptor() ([]byte, []int) {
+	return file_auth_v1_auth_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CheckPermissionRequest) GetSubjectType() string {
+	if x != nil {
+		return x.SubjectType
+	}
+	return ""
+}
+
+func (x *CheckPermissionRequest) GetSubjectId() string {
+	if x != nil {
+		return x.SubjectId
+	}
+	return ""
+}
+
+func (x *CheckPermissionRequest) GetRelation() string {
+	if x != nil {
+		return x.Relation
+	}
+	return ""
+}
+
+func (x *CheckPermissionRequest) GetObjectType() string {
+	if x != nil {
+		return x.ObjectType
+	}
+	return ""
+}
+
+func (x *CheckPermissionRequest) GetObjectId() string {
+	if x != nil {
+		return x.ObjectId
+	}
+	return ""
+}
+
+type CheckPermissionReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Allowed       bool                   `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckPermissionReply) Reset() {
+	*x = CheckPermissionReply{}
+	mi := &file_auth_v1_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckPermissionReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckPermissionReply) ProtoMessage() {}
+
+func (x *CheckPermissionReply) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_v1_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckPermissionReply.ProtoReflect.Descriptor instead.
+func (*CheckPermissionReply) Descriptor() ([]byte, []int) {
+	return file_auth_v1_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CheckPermissionReply) GetAllowed() bool {
+	if x != nil {
+		return x.Allowed
+	}
+	return false
+}
+
 var File_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_auth_v1_auth_proto_rawDesc = "" +
@@ -469,12 +589,23 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"\rLogoutRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"'\n" +
 	"\vLogoutReply\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xf3\x02\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xb4\x01\n" +
+	"\x16CheckPermissionRequest\x12!\n" +
+	"\fsubject_type\x18\x01 \x01(\tR\vsubjectType\x12\x1d\n" +
+	"\n" +
+	"subject_id\x18\x02 \x01(\tR\tsubjectId\x12\x1a\n" +
+	"\brelation\x18\x03 \x01(\tR\brelation\x12\x1f\n" +
+	"\vobject_type\x18\x04 \x01(\tR\n" +
+	"objectType\x12\x1b\n" +
+	"\tobject_id\x18\x05 \x01(\tR\bobjectId\"0\n" +
+	"\x14CheckPermissionReply\x12\x18\n" +
+	"\aallowed\x18\x01 \x01(\bR\aallowed2\xe1\x03\n" +
 	"\x04Auth\x12Z\n" +
 	"\bRegister\x12\x18.auth.v1.RegisterRequest\x1a\x16.auth.v1.RegisterReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/auth/register\x12N\n" +
 	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x13.auth.v1.LoginReply\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12k\n" +
 	"\fRefreshToken\x12\x1c.auth.v1.RefreshTokenRequest\x1a\x1a.auth.v1.RefreshTokenReply\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/auth/refresh-token\x12R\n" +
-	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x14.auth.v1.LogoutReply\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logoutB\x1aZ\x18auth_storage/api/auth/v1b\x06proto3"
+	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x14.auth.v1.LogoutReply\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logout\x12l\n" +
+	"\x0fCheckPermission\x12\x1f.auth.v1.CheckPermissionRequest\x1a\x1d.auth.v1.CheckPermissionReply\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/checkB\x1aZ\x18auth_storage/api/auth/v1b\x06proto3"
 
 var (
 	file_auth_v1_auth_proto_rawDescOnce sync.Once
@@ -488,28 +619,32 @@ func file_auth_v1_auth_proto_rawDescGZIP() []byte {
 	return file_auth_v1_auth_proto_rawDescData
 }
 
-var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_auth_v1_auth_proto_goTypes = []any{
-	(*RegisterRequest)(nil),     // 0: auth.v1.RegisterRequest
-	(*RegisterReply)(nil),       // 1: auth.v1.RegisterReply
-	(*LoginRequest)(nil),        // 2: auth.v1.LoginRequest
-	(*LoginReply)(nil),          // 3: auth.v1.LoginReply
-	(*RefreshTokenRequest)(nil), // 4: auth.v1.RefreshTokenRequest
-	(*RefreshTokenReply)(nil),   // 5: auth.v1.RefreshTokenReply
-	(*LogoutRequest)(nil),       // 6: auth.v1.LogoutRequest
-	(*LogoutReply)(nil),         // 7: auth.v1.LogoutReply
+	(*RegisterRequest)(nil),        // 0: auth.v1.RegisterRequest
+	(*RegisterReply)(nil),          // 1: auth.v1.RegisterReply
+	(*LoginRequest)(nil),           // 2: auth.v1.LoginRequest
+	(*LoginReply)(nil),             // 3: auth.v1.LoginReply
+	(*RefreshTokenRequest)(nil),    // 4: auth.v1.RefreshTokenRequest
+	(*RefreshTokenReply)(nil),      // 5: auth.v1.RefreshTokenReply
+	(*LogoutRequest)(nil),          // 6: auth.v1.LogoutRequest
+	(*LogoutReply)(nil),            // 7: auth.v1.LogoutReply
+	(*CheckPermissionRequest)(nil), // 8: auth.v1.CheckPermissionRequest
+	(*CheckPermissionReply)(nil),   // 9: auth.v1.CheckPermissionReply
 }
 var file_auth_v1_auth_proto_depIdxs = []int32{
 	0, // 0: auth.v1.Auth.Register:input_type -> auth.v1.RegisterRequest
 	2, // 1: auth.v1.Auth.Login:input_type -> auth.v1.LoginRequest
 	4, // 2: auth.v1.Auth.RefreshToken:input_type -> auth.v1.RefreshTokenRequest
 	6, // 3: auth.v1.Auth.Logout:input_type -> auth.v1.LogoutRequest
-	1, // 4: auth.v1.Auth.Register:output_type -> auth.v1.RegisterReply
-	3, // 5: auth.v1.Auth.Login:output_type -> auth.v1.LoginReply
-	5, // 6: auth.v1.Auth.RefreshToken:output_type -> auth.v1.RefreshTokenReply
-	7, // 7: auth.v1.Auth.Logout:output_type -> auth.v1.LogoutReply
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	8, // 4: auth.v1.Auth.CheckPermission:input_type -> auth.v1.CheckPermissionRequest
+	1, // 5: auth.v1.Auth.Register:output_type -> auth.v1.RegisterReply
+	3, // 6: auth.v1.Auth.Login:output_type -> auth.v1.LoginReply
+	5, // 7: auth.v1.Auth.RefreshToken:output_type -> auth.v1.RefreshTokenReply
+	7, // 8: auth.v1.Auth.Logout:output_type -> auth.v1.LogoutReply
+	9, // 9: auth.v1.Auth.CheckPermission:output_type -> auth.v1.CheckPermissionReply
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -526,7 +661,7 @@ func file_auth_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_v1_auth_proto_rawDesc), len(file_auth_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

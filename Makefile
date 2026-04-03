@@ -100,15 +100,12 @@ help:
 .DEFAULT_GOAL := help
 
 # sqlc
-.PHONY: sqlc
 sqlc:
 	$(SQLC) generate
 
-.PHONY: sqlc-check
 sqlc-check:
 	$(SQLC) vet
 
-.PHONY: sqlc-install
 sqlc-install:
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
