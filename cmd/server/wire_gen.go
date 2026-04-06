@@ -14,6 +14,7 @@ import (
 	"server/internal/data"
 	"server/internal/server"
 	"server/internal/service"
+	"server/internal/util"
 )
 
 import (
@@ -28,26 +29,20 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo)
-	greeterService := service.NewGreeterService(greeterUsecase)
 	authRepo := data.NewUserRepo(dataData, logger)
-	privatePEM, err := data.NewPrivatePEM(confServer)
+	privatePEM, err := util.NewPrivatePEM(confServer)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	publicPEM, err := data.NewPublicPEM(confServer)
+	publicPEM, err := util.NewPublicPEM(confServer)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	spiceClient, err := data.NewSpiceClient(confData)
-	if err != nil {
-		cleanup()
-		return nil, nil, err
-	}
-	authUseCase, err := biz.NewAuthUseCase(authRepo, privatePEM, publicPEM, spiceClient, confServer)
+	permissionRepo := data.NewPermissionRepo(dataData, logger)
+	transaction := data.NewTransactionManager(dataData)
+	authUseCase, err := biz.NewAuthUseCase(authRepo, privatePEM, publicPEM, permissionRepo, confServer, transaction)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -60,8 +55,10 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 		return nil, nil, err
 	}
 	m2MAuthService := service.NewM2MAuthService(m2MAuthUseCase, logger)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger, authService, m2MAuthService)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger, authService, m2MAuthService)
+	permissionUseCase := biz.NewPermissionUseCase(permissionRepo, confServer)
+	permissionService := service.NewPermissionService(permissionUseCase)
+	grpcServer := server.NewGRPCServer(confServer, logger, authService, m2MAuthService, permissionService)
+	httpServer := server.NewHTTPServer(confServer, logger, authService, m2MAuthService, permissionService)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

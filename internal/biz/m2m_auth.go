@@ -41,16 +41,16 @@ func NewM2MAuthUseCase(repo M2MAuthRepo, privatePEM PrivatePEM, conf *conf.Serve
 	}, nil
 }
 
-func (uc *M2MAuthUseCase) Login(ctx context.Context, clientID, clientSecret string) (string, int64, error) {
+func (uc *M2MAuthUseCase) Login(ctx context.Context, req *M2MAuthRequest) (*M2MAuthResponse, error) {
 	// 1. Get client by ID
-	client, err := uc.repo.GetMachineClientByID(ctx, clientID)
+	client, err := uc.repo.GetMachineClientByID(ctx, req.ClientID)
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid client credentials")
+		return nil, fmt.Errorf("invalid client credentials")
 	}
 
 	// 2. Verify secret
-	if err := bcrypt.CompareHashAndPassword([]byte(client.ClientSecretHash), []byte(clientSecret)); err != nil {
-		return "", 0, fmt.Errorf("invalid client credentials")
+	if err := bcrypt.CompareHashAndPassword([]byte(client.ClientSecretHash), []byte(req.ClientSecret)); err != nil {
+		return nil, fmt.Errorf("invalid client credentials")
 	}
 
 	// 3. Generate token
@@ -61,7 +61,7 @@ func (uc *M2MAuthUseCase) Login(ctx context.Context, clientID, clientSecret stri
 		"exp":   now.Add(AccessTokenTTL).Unix(),
 		"iat":   now.Unix(),
 		"jti":   uuid.New().String(),
-		"aud":   []string{"auth-service"},
+		"aud":   []string{IssuerName},
 		"scope": strings.Join(client.Scopes, " "),
 		"role":  "service",
 		"type":  "m2m",
@@ -76,8 +76,11 @@ func (uc *M2MAuthUseCase) Login(ctx context.Context, clientID, clientSecret stri
 
 	signedToken, err := token.SignedString(uc.privateKey)
 	if err != nil {
-		return "", 0, fmt.Errorf("failed to sign token: %w", err)
+		return nil, fmt.Errorf("failed to sign token: %w", err)
 	}
 
-	return signedToken, int64(AccessTokenTTL.Seconds()), nil
+	return &M2MAuthResponse{
+		AccessToken: signedToken,
+		ExpiresIn:   int64(AccessTokenTTL.Seconds()),
+	}, nil
 }

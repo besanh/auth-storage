@@ -12,27 +12,27 @@ The Auth Storage service is a Go-based authentication and authorization provider
 
 ## Core Components
 
-- **API Layer (`/api/auth/v1`)**: Protocol buffers defining the `Auth` service contracts and REST mappings.
-- **Business Layer (`internal/biz`)**: Domain logic including JWT generation, password hashing, and token rotation.
-- **Data Layer (`internal/data`)**: Repository implementations for Postgres, Redis client initialization, and SpiceDB client integration.
-- **Service Layer (`internal/service`)**: Implements gRPC handlers and maps incoming requests to usecase calls.
+- **API Layer (`/api`)**: Protocol buffers defining service contracts.
+    - `auth/v1`: Generic authentication and token management.
+    - `m2m_auth/v1`: Machine-to-machine authentication.
+    - `permission/v1`: Internal API for permission checks and relationship management.
+- **Service Layer (`internal/service`)**: Implements gRPC/HTTP handlers and maps proto requests to domain-specific usecase calls.
+- **Business Layer (`internal/biz`)**: Protocol-agnostic domain logic and repository interfaces. Houses core logic like JWT generation, password hashing, and authorization orchestration.
+- **Data Layer (`internal/data`)**: Infrastructure implementations, including database queries, SpiceDB client integration, and Redis operations.
 
 ## Key Features
 
-### 1. JWT with Dynamic KID
-Authenticates users using RSA-signed JWTs. The Key ID (**KID**) is dynamically generated via the **Makefile** and loaded by the application at startup. This enables safe key rotation by naming private/public keys with their unique ID.
+### 1. Protocol-Agnostic Core
+The `biz` and `data` layers are completely decoupled from protocol buffers. This ensures that the core business logic is independent of whether it's accessed via gRPC, HTTP, or internal calls.
 
-> [!CAUTION]
-> **Security Warning**: Private keys (`*.pem`) should **never** be committed to version control. They are ignored via `.gitignore`. In production, these should be managed through secure secrets storage (e.g., Kubernetes Secrets, AWS Secrets Manager).
-
-### 2. Token Rotation
-Every refresh token request results in a **brand new** Access Token and Refresh Token pair. This "rotation" strategy improves security by reducing the window of opportunity for stolen tokens.
+### 2. Centralized Transaction Management
+Cross-repository atomic operations are managed via a `Transaction` manager in the `data` layer. It utilizes `context` to propagate `*sql.Tx` across data access methods, ensuring data consistency between the relational database and external systems like SpiceDB.
 
 ### 3. SpiceDB Integration
-During registration, users are automatically provisioned into **SpiceDB**. High-level "platform global" relationships are established, allowing for future fine-grained permission checks.
+Fine-grained authorization is handled by SpiceDB. The `Permission` service provides a simplified internal interface for other microservices to check permissions or update ACL relationships.
 
-### 4. Redis-backed Logout
-When a user logs out, their Refresh Token's unique ID (**JTI**) is stored in **Redis** as a blacklisted entry. The entry's TTL is set to the token's remaining expiration time, ensuring the token cannot be reused even before it naturally expires.
+### 4. JWT with Dynamic KID
+Authenticates users using RSA-signed JWTs. The Key ID (**KID**) is dynamically loaded at startup, enabling safe key rotation.
 
-### 5. Visual API Documentation (Swagger UI)
-The project includes a **Swagger UI** integration via Docker Compose. Developers can interact with the API endpoints visually by running `make swagger`, which serves the OpenAPI specification at `http://localhost:8080`.
+### 5. Redis-backed Logout
+Managed blacklisting of JWT tokens ensures that logout is immediate and global across the system.

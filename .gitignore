@@ -38,5 +38,6 @@ bin/
 .vscode/
 .idea/
 *.swp
-.env
+*.env
 tmp
+__debug_bin*

@@ -1,25 +1,13 @@
-package data
+package util
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
-
 	"server/internal/biz"
 	"server/internal/conf"
-
-	"github.com/besanh/go-library/spicedb"
 )
-
-// NewSpiceClient creates a *spicedb.SpiceClient from the data config.
-func NewSpiceClient(c *conf.Data) (*spicedb.SpiceClient, error) {
-	opts := []spicedb.Option{}
-	if c.Spicedb.Insecure {
-		opts = append(opts, spicedb.WithInsecure())
-	}
-	return spicedb.NewClient(c.Spicedb.Endpoint, c.Spicedb.Token, opts...)
-}
 
 // certDir returns the absolute path to the cert directory next to the binary.
 func certDir() string {

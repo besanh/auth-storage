@@ -6,25 +6,6 @@ info:
     title: ""
     version: 0.0.1
 paths:
-    /helloworld/{name}:
-        get:
-            tags:
-                - Greeter
-            description: Sends a greeting
-            operationId: Greeter_SayHello
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
     /m2m/v1/auth/login:
         post:
             tags:
@@ -133,6 +114,44 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/auth.v1.RegisterReply'
+    /v1/internal/permissions/check:
+        post:
+            tags:
+                - Permission
+            description: 'Internal API: Asks SpiceDB if a subject can perform an action'
+            operationId: Permission_CheckPermission
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/permission.v1.CheckPermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/permission.v1.CheckPermissionReply'
+    /v1/internal/permissions/write:
+        post:
+            tags:
+                - Permission
+            description: 'Internal API: Tells SpiceDB to create a new ownership/parent tuple'
+            operationId: Permission_WriteRelationship
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/permission.v1.WriteRelationshipRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/permission.v1.WriteRelationshipReply'
 components:
     schemas:
         auth.v1.CheckPermissionReply:
@@ -209,12 +228,6 @@ components:
                     type: string
                 password:
                     type: string
-        helloworld.v1.HelloReply:
-            type: object
-            properties:
-                message:
-                    type: string
-            description: The response message containing the greetings
         m2m_auth.v1.LoginReply:
             type: object
             properties:
@@ -229,8 +242,43 @@ components:
                     type: string
                 clientSecret:
                     type: string
+        permission.v1.CheckPermissionReply:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+        permission.v1.CheckPermissionRequest:
+            type: object
+            properties:
+                subjectType:
+                    type: string
+                subjectId:
+                    type: string
+                relation:
+                    type: string
+                resourceType:
+                    type: string
+                resourceId:
+                    type: string
+        permission.v1.WriteRelationshipReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        permission.v1.WriteRelationshipRequest:
+            type: object
+            properties:
+                resourceType:
+                    type: string
+                resourceId:
+                    type: string
+                relation:
+                    type: string
+                subjectType:
+                    type: string
+                subjectId:
+                    type: string
 tags:
     - name: Auth
     - name: Auth
-    - name: Greeter
-      description: The greeting service definition.
+    - name: Permission

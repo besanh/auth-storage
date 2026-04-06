@@ -18,29 +18,13 @@ type userRepo struct {
 	log  *log.Helper
 }
 
+var ErrUserNotFound = fmt.Errorf("user not found")
+
 func NewUserRepo(data *Data, logger log.Logger) biz.AuthRepo {
 	return &userRepo{
 		data: data,
 		log:  log.NewHelper(logger),
 	}
-}
-
-func (r *userRepo) ExecTx(ctx context.Context, fn func(biz.AuthRepo) error) error {
-	tx, err := r.data.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	err = fn(&userRepo{
-		data: r.data,
-		log:  r.log,
-	})
-	if err != nil {
-		return err
-	}
-
-	return tx.Commit()
 }
 
 func (r *userRepo) InsertUser(ctx context.Context, in *db.User) (*db.User, error) {
@@ -52,7 +36,7 @@ func (r *userRepo) InsertUser(ctx context.Context, in *db.User) (*db.User, error
 		Status:       in.Status,
 	})
 	if err == sql.ErrNoRows {
-		return nil, biz.ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -63,7 +47,7 @@ func (r *userRepo) InsertUser(ctx context.Context, in *db.User) (*db.User, error
 func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*db.User, error) {
 	resp, err := r.data.Query.GetUserByEmail(ctx, sql.NullString{String: email, Valid: true})
 	if err == sql.ErrNoRows {
-		return nil, biz.ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -77,7 +61,7 @@ func (r *userRepo) UpdatePasswordHash(ctx context.Context, id string, passwordHa
 		PasswordHash: sql.NullString{String: passwordHash, Valid: true},
 	})
 	if err == sql.ErrNoRows {
-		return nil, biz.ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -88,7 +72,7 @@ func (r *userRepo) UpdatePasswordHash(ctx context.Context, id string, passwordHa
 func (r *userRepo) GetUserByID(ctx context.Context, id string) (*db.User, error) {
 	resp, err := r.data.Query.GetUserByID(ctx, uuid.Must(uuid.Parse(id)))
 	if err == sql.ErrNoRows {
-		return nil, biz.ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 	if err != nil {
 		return nil, err

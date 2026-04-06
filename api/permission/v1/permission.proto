@@ -1,0 +1,49 @@
+syntax="proto3";
+
+package permission.v1;
+
+option go_package = "auth_storage/api/permission/v1";
+
+import "google/api/annotations.proto";
+
+service Permission {
+    // Internal API: Asks SpiceDB if a subject can perform an action
+    rpc CheckPermission (CheckPermissionRequest) returns (CheckPermissionReply) {
+        option (google.api.http) = {
+            post: "/v1/internal/permissions/check"
+            body: "*"
+        };
+    }
+
+    // Internal API: Tells SpiceDB to create a new ownership/parent tuple
+    rpc WriteRelationship (WriteRelationshipRequest) returns (WriteRelationshipReply) {
+        option (google.api.http) = {
+            post: "/v1/internal/permissions/write"
+            body: "*"
+        };
+    }
+}
+
+message CheckPermissionRequest {
+    string subject_type = 1;  // e.g., "user"
+    string subject_id = 2;    // e.g., "123"
+    string relation = 3;      // e.g., "writer" or "owner"
+    string resource_type = 4; // e.g., "folder" or "file"
+    string resource_id = 5;   // e.g., "folder-789"
+}
+
+message CheckPermissionReply {
+    bool allowed = 1; // true if access is granted, false otherwise
+}
+
+message WriteRelationshipRequest {
+    string resource_type = 1; // e.g., "file"
+    string resource_id = 2;   // e.g., "file-999"
+    string relation = 3;      // e.g., "owner" or "parent"
+    string subject_type = 4;  // e.g., "user" or "folder"
+    string subject_id = 5;    // e.g., "123" or "folder-789"
+}
+
+message WriteRelationshipReply {
+    bool success = 1;
+}

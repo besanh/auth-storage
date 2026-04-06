@@ -23,12 +23,15 @@ func NewM2MAuthService(uc *biz.M2MAuthUseCase, logger log.Logger) *M2MAuthServic
 }
 
 func (s *M2MAuthService) Login(ctx context.Context, req *m2m_v1.LoginRequest) (*m2m_v1.LoginReply, error) {
-	token, expiresIn, err := s.uc.Login(ctx, req.ClientId, req.ClientSecret)
+	tokenReply, err := s.uc.Login(ctx, &biz.M2MAuthRequest{
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+	})
 	if err != nil {
 		return nil, err
 	}
 	return &m2m_v1.LoginReply{
-		AccessToken: token,
-		ExpiresIn:   expiresIn,
+		AccessToken: tokenReply.AccessToken,
+		ExpiresIn:   tokenReply.ExpiresIn,
 	}, nil
 }

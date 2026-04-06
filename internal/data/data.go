@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"server/internal/conf"
 	db "server/internal/data/db/generated"
+	"server/internal/util"
 	"time"
 
 	"github.com/authzed/authzed-go/v1"
@@ -19,7 +20,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewGreeterRepo, NewUserRepo, NewM2MAuthRepo, NewSpiceClient, NewPrivatePEM, NewPublicPEM)
+var ProviderSet = wire.NewSet(NewData, NewUserRepo, NewM2MAuthRepo, NewPermissionRepo, util.NewPrivatePEM, util.NewPublicPEM, NewTransactionManager)
 
 // Data .
 type Data struct {
