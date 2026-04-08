@@ -5,6 +5,8 @@ definition user {}
 
 definition service {}
 
+definition share_link {}
+
 definition group {
     relation member: user
 }
@@ -26,7 +28,7 @@ definition folder {
     relation owner: user | service
     
     relation editor: user | service | group#member
-    relation viewer: user | service | group#member | user:* // PERMISSIONS
+    relation viewer: user | service | share_link | group#member | user:*
     relation writer: user | service | group#member
     permission read = owner + editor + viewer + parent->read
     permission write = owner + editor + parent->write
@@ -46,7 +48,7 @@ definition file {
     relation owner: user | service
     
     relation editor: user | service | group#member
-    relation viewer: user | service | group#member | user:*
+    relation viewer: user | service | share_link | group#member | user:*
     
     permission read = owner + editor + viewer + parent->read
     permission write = owner + editor + parent->write

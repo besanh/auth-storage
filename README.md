@@ -4,13 +4,32 @@
 Comprehensive documentation is available in the [docs/](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs) folder:
 - [Architecture Overview](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/architecture.md)
 - [Sequence Flows](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/flows.md)
+- [Integration Guide](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/integration_guide.md)
 - [OpenAPI Specification](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/openapi.yaml)
+- [Development Guide](file:///Users/anhle/Downloads/BesAnh/k8s-practice/auth_storage/server/docs/development_guide.md)
 
-You can view the API documents visually by running:
+## Infrastructure Setup
+
+This project requires **Postgres**, **Redis**, **SpiceDB**, and **Vault**. You can start all dependencies using Docker Compose:
+
 ```bash
-make swagger
+docker compose up -d
 ```
-Then navigate to http://localhost:8080.
+
+### 🔐 Multi-Step Vault Initialization
+Vault is configured in **Persistent Server Mode**. Follow these steps for first-time setup:
+
+1.  **Initialize**: `make vault-init` (Save the 5 Unseal Keys and Root Token).
+2.  **Unseal**: Run `make vault-unseal` **3 times** with different keys.
+3.  **Configure Environment**: Update `.vault.env` with your new root token.
+4.  **Finish Init**: Run `make init-vault` to enable the KV-V2 engine.
+
+**Note**: You must run `make vault-unseal` (3 keys) every time the container restarts.
+
+## UI Dashboards
+*   **Vault UI**: [http://localhost:8200](http://localhost:8200) (Use Token login)
+*   **Swagger Docs**: Run `make swagger` and visit [http://localhost:8080](http://localhost:8080)
+
 
 ---
 
