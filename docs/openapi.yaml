@@ -133,6 +133,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/permission.v1.CheckPermissionReply'
+    /v1/internal/permissions/delete:
+        post:
+            tags:
+                - Permission
+            operationId: Permission_DeleteRelationship
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/permission.v1.DeleteRelationshipRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/permission.v1.DeleteRelationshipReply'
     /v1/internal/permissions/write:
         post:
             tags:
@@ -259,6 +277,24 @@ components:
                 resourceType:
                     type: string
                 resourceId:
+                    type: string
+        permission.v1.DeleteRelationshipReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        permission.v1.DeleteRelationshipRequest:
+            type: object
+            properties:
+                resourceType:
+                    type: string
+                resourceId:
+                    type: string
+                relation:
+                    type: string
+                subjectType:
+                    type: string
+                subjectId:
                     type: string
         permission.v1.WriteRelationshipReply:
             type: object

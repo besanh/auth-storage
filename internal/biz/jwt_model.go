@@ -1,6 +1,8 @@
 package biz
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type SpiceDBClaim struct {
 	Type string `json:"type"`
@@ -10,6 +12,7 @@ type SpiceDBClaim struct {
 type CustomClaims struct {
 	Role    string       `json:"role,omitempty"`
 	Scope   string       `json:"scope,omitempty"`
+	Type    string       `json:"type,omitempty"`
 	SpiceDB SpiceDBClaim `json:"spicedb,omitzero"`
 	jwt.RegisteredClaims
 }

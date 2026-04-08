@@ -95,3 +95,73 @@ sequenceDiagram
     Biz-->>Service: success
     Service-->>Client: LogoutReply(message)
 ```
+
+## 5. Machine-to-Machine (M2M) Login
+Authenticates microservices or automated clients using static IDs and secrets.
+
+```mermaid
+sequenceDiagram
+    participant Client as External Service
+    participant Service as M2MAuthService
+    participant Biz as M2MAuthUseCase
+    participant DB as Postgres
+
+    Client->>Service: Login(client_id, client_secret)
+    Service->>Biz: Login(ctx, client_id, client_secret)
+    Biz->>DB: GetMachineClientByID(client_id)
+    DB-->>Biz: Client Record (includes hashed secret)
+    Biz->>Biz: bcrypt.CompareHash(hash, client_secret)
+    
+    rect rgb(240, 240, 240)
+    Note over Biz: Generate M2M Token
+    Biz->>Biz: Set claims: sub=client_id, type=m2m
+    Biz->>Biz: Sign with RSA Private Key
+    end
+
+    Biz-->>Service: M2M AccessToken, ExpiresIn
+    Service-->>Client: LoginReply(...)
+```
+
+## 6. Business Operations & API Ordering
+
+This section describes the order in which internal and external APIs must be called to ensure data and permission consistency.
+
+### 6.1 Creating a Standard Folder
+When a user creates a new top-level folder.
+
+1.  **App Logic**: Generate a new UUID for the folder.
+2.  **App Logic**: Insert the folder record into the SQL database.
+3.  **Auth Call**: `Permission.WriteRelationship`
+    *   `resource_type`: `"folder"`
+    *   `resource_id`: `[folder_uuid]`
+    *   `relation`: `"owner"`
+    *   `subject_type`: `"user"`
+    *   `subject_id`: `[user_id]`
+
+### 6.2 Creating a Folder in a Shared Directory
+When a user creates a folder inside another folder that has its own permissions.
+
+1.  **App Logic**: Generate a new UUID for the folder.
+2.  **App Logic**: Insert the folder record into the SQL database (linked to parent).
+3.  **Auth Call (Owner)**: `Permission.WriteRelationship`
+    *   `relation`: `"owner"`, `subject_type`: `"user"`, `subject_id`: `[user_id]`
+4.  **Auth Call (Inheritance)**: `Permission.WriteRelationship`
+    *   `resource_type`: `"folder"`
+    *   `resource_id`: `[new_folder_uuid]`
+    *   `relation`: `"parent"`
+    *   `subject_type`: `"folder"`
+    *   `subject_id`: `[parent_folder_uuid]`
+    *   *Note: This ensures parent permissions flow down to the new child.*
+
+### 6.3 Verifying Access before Action
+Before allowing a user to read or modify a file/folder.
+
+1.  **Auth Call**: `Permission.CheckPermission`
+    *   `resource_type`: `"folder"`
+    *   `resource_id`: `[target_id]`
+    *   `relation`: `"read"` (or `"write"` / `"delete"`)
+    *   `subject_type`: `"user"`
+    *   `subject_id`: `[user_id]`
+2.  **App Logic**: Proceed with the database operation ONLY if `Allowed: true`.
+
+

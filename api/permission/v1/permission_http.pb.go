@@ -20,11 +20,13 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationPermissionCheckPermission = "/permission.v1.Permission/CheckPermission"
+const OperationPermissionDeleteRelationship = "/permission.v1.Permission/DeleteRelationship"
 const OperationPermissionWriteRelationship = "/permission.v1.Permission/WriteRelationship"
 
 type PermissionHTTPServer interface {
 	// CheckPermission Internal API: Asks SpiceDB if a subject can perform an action
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error)
+	DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error)
 	// WriteRelationship Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error)
 }
@@ -33,6 +35,7 @@ func RegisterPermissionHTTPServer(s *http.Server, srv PermissionHTTPServer) {
 	r := s.Route("/")
 	r.POST("/v1/internal/permissions/check", _Permission_CheckPermission1_HTTP_Handler(srv))
 	r.POST("/v1/internal/permissions/write", _Permission_WriteRelationship0_HTTP_Handler(srv))
+	r.POST("/v1/internal/permissions/delete", _Permission_DeleteRelationship0_HTTP_Handler(srv))
 }
 
 func _Permission_CheckPermission1_HTTP_Handler(srv PermissionHTTPServer) func(ctx http.Context) error {
@@ -79,9 +82,32 @@ func _Permission_WriteRelationship0_HTTP_Handler(srv PermissionHTTPServer) func(
 	}
 }
 
+func _Permission_DeleteRelationship0_HTTP_Handler(srv PermissionHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteRelationshipRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPermissionDeleteRelationship)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteRelationship(ctx, req.(*DeleteRelationshipRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteRelationshipReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type PermissionHTTPClient interface {
 	// CheckPermission Internal API: Asks SpiceDB if a subject can perform an action
 	CheckPermission(ctx context.Context, req *CheckPermissionRequest, opts ...http.CallOption) (rsp *CheckPermissionReply, err error)
+	DeleteRelationship(ctx context.Context, req *DeleteRelationshipRequest, opts ...http.CallOption) (rsp *DeleteRelationshipReply, err error)
 	// WriteRelationship Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(ctx context.Context, req *WriteRelationshipRequest, opts ...http.CallOption) (rsp *WriteRelationshipReply, err error)
 }
@@ -100,6 +126,19 @@ func (c *PermissionHTTPClientImpl) CheckPermission(ctx context.Context, in *Chec
 	pattern := "/v1/internal/permissions/check"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPermissionCheckPermission))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PermissionHTTPClientImpl) DeleteRelationship(ctx context.Context, in *DeleteRelationshipRequest, opts ...http.CallOption) (*DeleteRelationshipReply, error) {
+	var out DeleteRelationshipReply
+	pattern := "/v1/internal/permissions/delete"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPermissionDeleteRelationship))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

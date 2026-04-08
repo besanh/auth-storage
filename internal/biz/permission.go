@@ -8,6 +8,7 @@ import (
 type PermissionRepo interface {
 	CheckPermission(ctx context.Context, cp *CheckPermissionRequest) (*CheckPermissionResponse, error)
 	WriteRelationship(ctx context.Context, rel *WriteRelationshipRequest) (*WriteRelationshipResponse, error)
+	DeleteRelationship(ctx context.Context, rel *DeleteRelationshipRequest) (*DeleteRelationshipResponse, error)
 }
 
 type PermissionUseCase struct {
@@ -25,4 +26,8 @@ func (p *PermissionUseCase) CheckPermission(ctx context.Context, cp *CheckPermis
 
 func (p *PermissionUseCase) WriteRelationship(ctx context.Context, rel *WriteRelationshipRequest) (*WriteRelationshipResponse, error) {
 	return p.permissionRepo.WriteRelationship(ctx, rel)
+}
+
+func (p *PermissionUseCase) DeleteRelationship(ctx context.Context, rel *DeleteRelationshipRequest) (*DeleteRelationshipResponse, error) {
+	return p.permissionRepo.DeleteRelationship(ctx, rel)
 }

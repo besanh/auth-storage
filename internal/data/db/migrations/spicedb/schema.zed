@@ -10,10 +10,12 @@ definition group {
 }
 
 // =========================
-// THE PLATFORM (Added to fix the error!)
+// THE PLATFORM
 // =========================
 definition platform {
-    relation member: user
+    relation member: user | service
+    relation everyone: user:*
+    permission create = member + everyone
 }
 
 // =========================
@@ -25,6 +27,7 @@ definition folder {
     
     relation editor: user | service | group#member
     relation viewer: user | service | group#member | user:* // PERMISSIONS
+    relation writer: user | service | group#member
     permission read = owner + editor + viewer + parent->read
     permission write = owner + editor + parent->write
     permission delete = owner
@@ -33,4 +36,20 @@ definition folder {
     // Used by services
     permission list = read
     permission create = write
+}
+
+// =========================
+// FILE
+// =========================
+definition file {
+    relation parent: folder
+    relation owner: user | service
+    
+    relation editor: user | service | group#member
+    relation viewer: user | service | group#member | user:*
+    
+    permission read = owner + editor + viewer + parent->read
+    permission write = owner + editor + parent->write
+    permission delete = owner
+    permission share = owner + editor
 }

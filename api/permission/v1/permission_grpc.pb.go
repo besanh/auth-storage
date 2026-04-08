@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Permission_CheckPermission_FullMethodName   = "/permission.v1.Permission/CheckPermission"
-	Permission_WriteRelationship_FullMethodName = "/permission.v1.Permission/WriteRelationship"
+	Permission_CheckPermission_FullMethodName    = "/permission.v1.Permission/CheckPermission"
+	Permission_WriteRelationship_FullMethodName  = "/permission.v1.Permission/WriteRelationship"
+	Permission_DeleteRelationship_FullMethodName = "/permission.v1.Permission/DeleteRelationship"
 )
 
 // PermissionClient is the client API for Permission service.
@@ -31,6 +32,7 @@ type PermissionClient interface {
 	CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionReply, error)
 	// Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(ctx context.Context, in *WriteRelationshipRequest, opts ...grpc.CallOption) (*WriteRelationshipReply, error)
+	DeleteRelationship(ctx context.Context, in *DeleteRelationshipRequest, opts ...grpc.CallOption) (*DeleteRelationshipReply, error)
 }
 
 type permissionClient struct {
@@ -61,6 +63,16 @@ func (c *permissionClient) WriteRelationship(ctx context.Context, in *WriteRelat
 	return out, nil
 }
 
+func (c *permissionClient) DeleteRelationship(ctx context.Context, in *DeleteRelationshipRequest, opts ...grpc.CallOption) (*DeleteRelationshipReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteRelationshipReply)
+	err := c.cc.Invoke(ctx, Permission_DeleteRelationship_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PermissionServer is the server API for Permission service.
 // All implementations must embed UnimplementedPermissionServer
 // for forward compatibility.
@@ -69,6 +81,7 @@ type PermissionServer interface {
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error)
 	// Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error)
+	DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error)
 	mustEmbedUnimplementedPermissionServer()
 }
 
@@ -84,6 +97,9 @@ func (UnimplementedPermissionServer) CheckPermission(context.Context, *CheckPerm
 }
 func (UnimplementedPermissionServer) WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method WriteRelationship not implemented")
+}
+func (UnimplementedPermissionServer) DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteRelationship not implemented")
 }
 func (UnimplementedPermissionServer) mustEmbedUnimplementedPermissionServer() {}
 func (UnimplementedPermissionServer) testEmbeddedByValue()                    {}
@@ -142,6 +158,24 @@ func _Permission_WriteRelationship_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Permission_DeleteRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRelationshipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServer).DeleteRelationship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Permission_DeleteRelationship_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServer).DeleteRelationship(ctx, req.(*DeleteRelationshipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Permission_ServiceDesc is the grpc.ServiceDesc for Permission service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -156,6 +190,10 @@ var Permission_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "WriteRelationship",
 			Handler:    _Permission_WriteRelationship_Handler,
+		},
+		{
+			MethodName: "DeleteRelationship",
+			Handler:    _Permission_DeleteRelationship_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

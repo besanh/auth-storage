@@ -23,3 +23,15 @@ type WriteRelationshipRequest struct {
 type WriteRelationshipResponse struct {
 	Success bool
 }
+
+type DeleteRelationshipRequest struct {
+	ResourceType string
+	ResourceID   string
+	Relation     string
+	SubjectType  string
+	SubjectID    string
+}
+
+type DeleteRelationshipResponse struct {
+	Success bool
+}

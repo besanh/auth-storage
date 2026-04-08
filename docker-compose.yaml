@@ -80,15 +80,15 @@ services:
     container_name: auth-storage-hashicorp
     ports:
       - "8200:8200"
+    command: ["vault", "server", "-config=/vault/config/vault-config.hcl"]
     environment:
-      # These now pull directly from your .env file
-      VAULT_DEV_ROOT_TOKEN_ID: "${VAULT_DEV_ROOT_TOKEN_ID}"
       VAULT_ADDR: "${VAULT_ADDR}"
       VAULT_UI: "true"
     cap_add:
       - IPC_LOCK
     volumes:
       - ./tmp/vault_data:/vault/file
+      - ./vault-config.hcl:/vault/config/vault-config.hcl
     restart: always
     networks:
       - auth-storage-network

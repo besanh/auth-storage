@@ -55,19 +55,21 @@ func (uc *M2MAuthUseCase) Login(ctx context.Context, req *M2MAuthRequest) (*M2MA
 
 	// 3. Generate token
 	now := time.Now().UTC()
-	claims := jwt.MapClaims{
-		"sub":   client.ClientID,
-		"iss":   IssuerName,
-		"exp":   now.Add(AccessTokenTTL).Unix(),
-		"iat":   now.Unix(),
-		"jti":   uuid.New().String(),
-		"aud":   []string{IssuerName},
-		"scope": strings.Join(client.Scopes, " "),
-		"role":  "service",
-		"type":  "m2m",
-		"spicedb": map[string]string{
-			"type": "client",
-			"id":   client.ClientID,
+	claims := CustomClaims{
+		Role:  "service",
+		Scope: strings.Join(client.Scopes, " "),
+		Type:  "m2m",
+		SpiceDB: SpiceDBClaim{
+			Type: "client",
+			ID:   client.ClientID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   client.ClientID,
+			Issuer:    IssuerName,
+			ExpiresAt: jwt.NewNumericDate(now.Add(AccessTokenTTL)),
+			IssuedAt:  jwt.NewNumericDate(now),
+			ID:        uuid.New().String(),
+			Audience:  jwt.ClaimStrings{IssuerName}, // Ensure string array format
 		},
 	}
 

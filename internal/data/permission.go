@@ -72,3 +72,33 @@ func (r *permissionRepo) WriteRelationship(ctx context.Context, rel *biz.WriteRe
 		Success: true,
 	}, nil
 }
+
+func (r *permissionRepo) DeleteRelationship(ctx context.Context, rel *biz.DeleteRelationshipRequest) (*biz.DeleteRelationshipResponse, error) {
+	_, err := r.data.SpiceDB.WriteRelationships(ctx, &v1.WriteRelationshipsRequest{
+		Updates: []*v1.RelationshipUpdate{
+			{
+				Operation: v1.RelationshipUpdate_OPERATION_DELETE,
+				Relationship: &v1.Relationship{
+					Resource: &v1.ObjectReference{
+						ObjectType: rel.ResourceType,
+						ObjectId:   rel.ResourceID,
+					},
+					Relation: rel.Relation,
+					Subject: &v1.SubjectReference{
+						Object: &v1.ObjectReference{
+							ObjectType: rel.SubjectType,
+							ObjectId:   rel.SubjectID,
+						},
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &biz.DeleteRelationshipResponse{
+		Success: true,
+	}, nil
+}

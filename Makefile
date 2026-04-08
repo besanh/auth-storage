@@ -164,20 +164,24 @@ swagger:
 
 .PHONY: vault-up
 vault-up:
-	@echo "Generating fresh Root Token..."
-	@$(eval DEV_TOKEN := $(shell openssl rand -hex 16))
-	@echo "VAULT_DEV_ROOT_TOKEN_ID=$(DEV_TOKEN)" > .vault.env
-	@echo "VAULT_ADDR=http://0.0.0.0:8200" >> .vault.env
-	@echo "--------------------------------------------------"
-	@echo "🚀 Starting Vault with Root Token: $(DEV_TOKEN)"
-	@echo "--------------------------------------------------"
-	@docker-compose --env-file .vault.env up -d
+	@echo "🚀 Starting Vault (Persistent Mode)..."
+	@docker-compose up -d hashicorp
+	@echo "Vault is starting. Use 'make vault-init' for first-time setup or 'make vault-unseal' to unseal."
+
+.PHONY: vault-init
+vault-init:
+	@echo "Initializing Vault..."
+	@docker exec -it auth-storage-hashicorp vault operator init
+
+.PHONY: vault-unseal
+vault-unseal:
+	@echo "Unsealing Vault (requires 3 keys)..."
+	@docker exec -it auth-storage-hashicorp vault operator unseal
 
 .PHONY: init-vault
 init-vault:
 	@echo "Checking Vault KV-V2 Secrets Engine..."
-	@# Load the token from .env
-	@export $$(grep -v '^#' .env | xargs) && \
+	@set -a; [ -f .env ] && . ./.env; [ -f .vault.env ] && . ./.vault.env; set +a; \
 	if docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp vault secrets list | grep -q "^secret/"; then \
 		echo "✅ Vault is already initialized at /secret. Skipping."; \
 	else \
@@ -194,7 +198,14 @@ create-m2m-vault:
 		echo "Usage: make create-m2m-vault id=\"service-id\" name=\"Service Name\""; \
 		exit 1; \
 	fi
-	@echo "Generating credentials and pushing to Vault..."
-	@# Load the token from the standard .env file we created
-	@export $$(grep -v '^#' .env | xargs) && \
-	 go run scripts/create_m2m_client.go -id "$(id)" -name "$(name)" -vault
+	@echo "Generating credentials..."
+	@SECRET=$$(openssl rand -hex 32); \
+	set -a; [ -f .env ] && . ./.env; [ -f .vault.env ] && . ./.vault.env; set +a; \
+	echo "Pushing to Vault..."; \
+	docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp \
+		vault kv put secret/storage/m2m/$(id) client_id=$(id) client_secret=$$SECRET; \
+	echo "Inserting into Database..."; \
+	docker exec auth-storage-timescale sh -c \
+		"psql -U \$$POSTGRES_USER -d \$$POSTGRES_DB -c \"INSERT INTO machine_clients (client_id, client_secret_hash, name, scopes) VALUES ('$(id)', crypt('$$SECRET', gen_salt('bf')), '$(name)', '{}') ON CONFLICT (client_id) DO UPDATE SET client_secret_hash = EXCLUDED.client_secret_hash, name = EXCLUDED.name, updated_at = NOW();\""; \
+	echo "✅ M2M Client '$(id)' created successfully!"; \
+	echo "🔑 Secret stored in Vault at secret/storage/m2m/$(id)"

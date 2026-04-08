@@ -262,6 +262,126 @@ func (x *WriteRelationshipReply) GetSuccess() bool {
 	return false
 }
 
+type DeleteRelationshipRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResourceType  string                 `protobuf:"bytes,1,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"` // e.g., "file"
+	ResourceId    string                 `protobuf:"bytes,2,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`       // e.g., "file-999"
+	Relation      string                 `protobuf:"bytes,3,opt,name=relation,proto3" json:"relation,omitempty"`                             // e.g., "owner" or "parent"
+	SubjectType   string                 `protobuf:"bytes,4,opt,name=subject_type,json=subjectType,proto3" json:"subject_type,omitempty"`    // e.g., "user" or "folder"
+	SubjectId     string                 `protobuf:"bytes,5,opt,name=subject_id,json=subjectId,proto3" json:"subject_id,omitempty"`          // e.g., "123" or "folder-789"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRelationshipRequest) Reset() {
+	*x = DeleteRelationshipRequest{}
+	mi := &file_permission_v1_permission_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRelationshipRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRelationshipRequest) ProtoMessage() {}
+
+func (x *DeleteRelationshipRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_permission_v1_permission_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRelationshipRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRelationshipRequest) Descriptor() ([]byte, []int) {
+	return file_permission_v1_permission_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DeleteRelationshipRequest) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *DeleteRelationshipRequest) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *DeleteRelationshipRequest) GetRelation() string {
+	if x != nil {
+		return x.Relation
+	}
+	return ""
+}
+
+func (x *DeleteRelationshipRequest) GetSubjectType() string {
+	if x != nil {
+		return x.SubjectType
+	}
+	return ""
+}
+
+func (x *DeleteRelationshipRequest) GetSubjectId() string {
+	if x != nil {
+		return x.SubjectId
+	}
+	return ""
+}
+
+type DeleteRelationshipReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRelationshipReply) Reset() {
+	*x = DeleteRelationshipReply{}
+	mi := &file_permission_v1_permission_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRelationshipReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRelationshipReply) ProtoMessage() {}
+
+func (x *DeleteRelationshipReply) ProtoReflect() protoreflect.Message {
+	mi := &file_permission_v1_permission_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRelationshipReply.ProtoReflect.Descriptor instead.
+func (*DeleteRelationshipReply) Descriptor() ([]byte, []int) {
+	return file_permission_v1_permission_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DeleteRelationshipReply) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_permission_v1_permission_proto protoreflect.FileDescriptor
 
 const file_permission_v1_permission_proto_rawDesc = "" +
@@ -286,11 +406,22 @@ const file_permission_v1_permission_proto_rawDesc = "" +
 	"\n" +
 	"subject_id\x18\x05 \x01(\tR\tsubjectId\"2\n" +
 	"\x16WriteRelationshipReply\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xa8\x02\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"\xbf\x01\n" +
+	"\x19DeleteRelationshipRequest\x12#\n" +
+	"\rresource_type\x18\x01 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x02 \x01(\tR\n" +
+	"resourceId\x12\x1a\n" +
+	"\brelation\x18\x03 \x01(\tR\brelation\x12!\n" +
+	"\fsubject_type\x18\x04 \x01(\tR\vsubjectType\x12\x1d\n" +
+	"\n" +
+	"subject_id\x18\x05 \x01(\tR\tsubjectId\"3\n" +
+	"\x17DeleteRelationshipReply\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xbd\x03\n" +
 	"\n" +
 	"Permission\x12\x88\x01\n" +
 	"\x0fCheckPermission\x12%.permission.v1.CheckPermissionRequest\x1a#.permission.v1.CheckPermissionReply\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/internal/permissions/check\x12\x8e\x01\n" +
-	"\x11WriteRelationship\x12'.permission.v1.WriteRelationshipRequest\x1a%.permission.v1.WriteRelationshipReply\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/internal/permissions/writeB Z\x1eauth_storage/api/permission/v1b\x06proto3"
+	"\x11WriteRelationship\x12'.permission.v1.WriteRelationshipRequest\x1a%.permission.v1.WriteRelationshipReply\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/internal/permissions/write\x12\x92\x01\n" +
+	"\x12DeleteRelationship\x12(.permission.v1.DeleteRelationshipRequest\x1a&.permission.v1.DeleteRelationshipReply\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/internal/permissions/deleteB Z\x1eauth_storage/api/permission/v1b\x06proto3"
 
 var (
 	file_permission_v1_permission_proto_rawDescOnce sync.Once
@@ -304,20 +435,24 @@ func file_permission_v1_permission_proto_rawDescGZIP() []byte {
 	return file_permission_v1_permission_proto_rawDescData
 }
 
-var file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_permission_v1_permission_proto_goTypes = []any{
-	(*CheckPermissionRequest)(nil),   // 0: permission.v1.CheckPermissionRequest
-	(*CheckPermissionReply)(nil),     // 1: permission.v1.CheckPermissionReply
-	(*WriteRelationshipRequest)(nil), // 2: permission.v1.WriteRelationshipRequest
-	(*WriteRelationshipReply)(nil),   // 3: permission.v1.WriteRelationshipReply
+	(*CheckPermissionRequest)(nil),    // 0: permission.v1.CheckPermissionRequest
+	(*CheckPermissionReply)(nil),      // 1: permission.v1.CheckPermissionReply
+	(*WriteRelationshipRequest)(nil),  // 2: permission.v1.WriteRelationshipRequest
+	(*WriteRelationshipReply)(nil),    // 3: permission.v1.WriteRelationshipReply
+	(*DeleteRelationshipRequest)(nil), // 4: permission.v1.DeleteRelationshipRequest
+	(*DeleteRelationshipReply)(nil),   // 5: permission.v1.DeleteRelationshipReply
 }
 var file_permission_v1_permission_proto_depIdxs = []int32{
 	0, // 0: permission.v1.Permission.CheckPermission:input_type -> permission.v1.CheckPermissionRequest
 	2, // 1: permission.v1.Permission.WriteRelationship:input_type -> permission.v1.WriteRelationshipRequest
-	1, // 2: permission.v1.Permission.CheckPermission:output_type -> permission.v1.CheckPermissionReply
-	3, // 3: permission.v1.Permission.WriteRelationship:output_type -> permission.v1.WriteRelationshipReply
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	4, // 2: permission.v1.Permission.DeleteRelationship:input_type -> permission.v1.DeleteRelationshipRequest
+	1, // 3: permission.v1.Permission.CheckPermission:output_type -> permission.v1.CheckPermissionReply
+	3, // 4: permission.v1.Permission.WriteRelationship:output_type -> permission.v1.WriteRelationshipReply
+	5, // 5: permission.v1.Permission.DeleteRelationship:output_type -> permission.v1.DeleteRelationshipReply
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -334,7 +469,7 @@ func file_permission_v1_permission_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_permission_v1_permission_proto_rawDesc), len(file_permission_v1_permission_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
