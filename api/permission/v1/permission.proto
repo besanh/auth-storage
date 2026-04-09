@@ -6,7 +6,7 @@ option go_package = "auth_storage/api/permission/v1";
 
 import "google/api/annotations.proto";
 
-service Permission {
+service PermissionService {
     // Internal API: Asks SpiceDB if a subject can perform an action
     rpc CheckPermission (CheckPermissionRequest) returns (CheckPermissionReply) {
         option (google.api.http) = {
@@ -75,17 +75,16 @@ message DeleteRelationshipReply {
 }
 
 message SwapRelationshipRequest {
-    string resource_type = 1; // e.g., "file"
-    string resource_id = 2;   // e.g., "file-999"
-    string relation = 3;      // e.g., "viewer"
+    string resource_type = 1; // e.g., "file" or "folder"
+    string resource_id = 2;   // e.g., "789-abc-..."
     
-    // Old subject to remove
-    string old_subject_type = 4;
-    string old_subject_id = 5;
+    // The actor stays exactly the same
+    string subject_type = 3;  // e.g., "share_link" (or "user")
+    string subject_id = 4;    // e.g., "V1StGXR8_Z5jdHi6B-myT"
     
-    // New subject to add
-    string new_subject_type = 6;
-    string new_subject_id = 7;
+    // The permission is what gets swapped
+    string old_relation = 5;  // e.g., "viewer"
+    string new_relation = 6;  // e.g., "editor"
 }
 
 message SwapRelationshipReply {

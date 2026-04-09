@@ -84,7 +84,7 @@ func (uc *AuthUseCase) Register(ctx context.Context, req *RegisterRequest) (*Reg
 		}
 
 		// 3. Provision the user in SpiceDB (AuthZ)
-		_, err = uc.permRepo.WriteRelationship(ctx, &WriteRelationshipRequest{
+		_, err = uc.permRepo.WriteRelationship(ctx, WriteRelationshipRequest{
 			ResourceType: "platform",
 			ResourceID:   "global",
 			Relation:     "member",
@@ -230,7 +230,7 @@ func (uc *AuthUseCase) Logout(ctx context.Context, req *LogoutRequest) (*LogoutR
 }
 
 func (uc *AuthUseCase) CheckPermission(ctx context.Context, req *CheckPermissionRequest) (*CheckPermissionResponse, error) {
-	resp, err := uc.permRepo.CheckPermission(ctx, &CheckPermissionRequest{
+	resp, err := uc.permRepo.CheckPermission(ctx, CheckPermissionRequest{
 		ResourceType: req.ResourceType,
 		ResourceID:   req.ResourceID,
 		Relation:     req.Relation,

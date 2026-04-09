@@ -29,8 +29,8 @@ func NewGRPCServer(c *conf.Server, logger log.Logger, auth *service.AuthService,
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	authV1.RegisterAuthServer(srv, auth)
-	m2mV1.RegisterAuthServer(srv, m2mAuth)
-	permissionV1.RegisterPermissionServer(srv, permission)
+	authV1.RegisterAuthServiceServer(srv, auth)
+	m2mV1.RegisterAuthServiceServer(srv, m2mAuth)
+	permissionV1.RegisterPermissionServiceServer(srv, permission)
 	return srv
 }

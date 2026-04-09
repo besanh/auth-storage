@@ -599,8 +599,8 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"objectType\x12\x1b\n" +
 	"\tobject_id\x18\x05 \x01(\tR\bobjectId\"0\n" +
 	"\x14CheckPermissionReply\x12\x18\n" +
-	"\aallowed\x18\x01 \x01(\bR\aallowed2\xe1\x03\n" +
-	"\x04Auth\x12Z\n" +
+	"\aallowed\x18\x01 \x01(\bR\aallowed2\xe8\x03\n" +
+	"\vAuthService\x12Z\n" +
 	"\bRegister\x12\x18.auth.v1.RegisterRequest\x1a\x16.auth.v1.RegisterReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/auth/register\x12N\n" +
 	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x13.auth.v1.LoginReply\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12k\n" +
 	"\fRefreshToken\x12\x1c.auth.v1.RefreshTokenRequest\x1a\x1a.auth.v1.RefreshTokenReply\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/auth/refresh-token\x12R\n" +
@@ -633,16 +633,16 @@ var file_auth_v1_auth_proto_goTypes = []any{
 	(*CheckPermissionReply)(nil),   // 9: auth.v1.CheckPermissionReply
 }
 var file_auth_v1_auth_proto_depIdxs = []int32{
-	0, // 0: auth.v1.Auth.Register:input_type -> auth.v1.RegisterRequest
-	2, // 1: auth.v1.Auth.Login:input_type -> auth.v1.LoginRequest
-	4, // 2: auth.v1.Auth.RefreshToken:input_type -> auth.v1.RefreshTokenRequest
-	6, // 3: auth.v1.Auth.Logout:input_type -> auth.v1.LogoutRequest
-	8, // 4: auth.v1.Auth.CheckPermission:input_type -> auth.v1.CheckPermissionRequest
-	1, // 5: auth.v1.Auth.Register:output_type -> auth.v1.RegisterReply
-	3, // 6: auth.v1.Auth.Login:output_type -> auth.v1.LoginReply
-	5, // 7: auth.v1.Auth.RefreshToken:output_type -> auth.v1.RefreshTokenReply
-	7, // 8: auth.v1.Auth.Logout:output_type -> auth.v1.LogoutReply
-	9, // 9: auth.v1.Auth.CheckPermission:output_type -> auth.v1.CheckPermissionReply
+	0, // 0: auth.v1.AuthService.Register:input_type -> auth.v1.RegisterRequest
+	2, // 1: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
+	4, // 2: auth.v1.AuthService.RefreshToken:input_type -> auth.v1.RefreshTokenRequest
+	6, // 3: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
+	8, // 4: auth.v1.AuthService.CheckPermission:input_type -> auth.v1.CheckPermissionRequest
+	1, // 5: auth.v1.AuthService.Register:output_type -> auth.v1.RegisterReply
+	3, // 6: auth.v1.AuthService.Login:output_type -> auth.v1.LoginReply
+	5, // 7: auth.v1.AuthService.RefreshToken:output_type -> auth.v1.RefreshTokenReply
+	7, // 8: auth.v1.AuthService.Logout:output_type -> auth.v1.LogoutReply
+	9, // 9: auth.v1.AuthService.CheckPermission:output_type -> auth.v1.CheckPermissionReply
 	5, // [5:10] is the sub-list for method output_type
 	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

@@ -20,17 +20,17 @@ func NewPermissionRepo(data *Data, logger log.Logger) biz.PermissionRepo {
 	}
 }
 
-func (r *permissionRepo) CheckPermission(ctx context.Context, cp *biz.CheckPermissionRequest) (*biz.CheckPermissionResponse, error) {
+func (r *permissionRepo) CheckPermission(ctx context.Context, input biz.CheckPermissionRequest) (*biz.CheckPermissionResponse, error) {
 	resp, err := r.data.SpiceDB.CheckPermission(ctx, &v1.CheckPermissionRequest{
 		Resource: &v1.ObjectReference{
-			ObjectType: cp.ResourceType,
-			ObjectId:   cp.ResourceID,
+			ObjectType: input.ResourceType,
+			ObjectId:   input.ResourceID,
 		},
-		Permission: cp.Relation,
+		Permission: input.Relation,
 		Subject: &v1.SubjectReference{
 			Object: &v1.ObjectReference{
-				ObjectType: cp.SubjectType,
-				ObjectId:   cp.SubjectID,
+				ObjectType: input.SubjectType,
+				ObjectId:   input.SubjectID,
 			},
 		},
 	})
@@ -43,7 +43,7 @@ func (r *permissionRepo) CheckPermission(ctx context.Context, cp *biz.CheckPermi
 	}, nil
 }
 
-func (r *permissionRepo) WriteRelationship(ctx context.Context, rel *biz.WriteRelationshipRequest) (*biz.WriteRelationshipResponse, error) {
+func (r *permissionRepo) WriteRelationship(ctx context.Context, rel biz.WriteRelationshipRequest) (*biz.WriteRelationshipResponse, error) {
 	_, err := r.data.SpiceDB.WriteRelationships(ctx, &v1.WriteRelationshipsRequest{
 		Updates: []*v1.RelationshipUpdate{
 			{
@@ -73,7 +73,7 @@ func (r *permissionRepo) WriteRelationship(ctx context.Context, rel *biz.WriteRe
 	}, nil
 }
 
-func (r *permissionRepo) DeleteRelationship(ctx context.Context, rel *biz.DeleteRelationshipRequest) (*biz.DeleteRelationshipResponse, error) {
+func (r *permissionRepo) DeleteRelationship(ctx context.Context, rel biz.DeleteRelationshipRequest) (*biz.DeleteRelationshipResponse, error) {
 	_, err := r.data.SpiceDB.WriteRelationships(ctx, &v1.WriteRelationshipsRequest{
 		Updates: []*v1.RelationshipUpdate{
 			{
@@ -103,7 +103,7 @@ func (r *permissionRepo) DeleteRelationship(ctx context.Context, rel *biz.Delete
 	}, nil
 }
 
-func (r *permissionRepo) SwapRelationship(ctx context.Context, rel *biz.SwapRelationshipRequest) (*biz.SwapRelationshipResponse, error) {
+func (r *permissionRepo) SwapRelationship(ctx context.Context, rel biz.SwapRelationshipRequest) (*biz.SwapRelationshipResponse, error) {
 	_, err := r.data.SpiceDB.WriteRelationships(ctx, &v1.WriteRelationshipsRequest{
 		Updates: []*v1.RelationshipUpdate{
 			{
@@ -113,11 +113,11 @@ func (r *permissionRepo) SwapRelationship(ctx context.Context, rel *biz.SwapRela
 						ObjectType: rel.ResourceType,
 						ObjectId:   rel.ResourceID,
 					},
-					Relation: rel.Relation,
+					Relation: rel.OldRelation,
 					Subject: &v1.SubjectReference{
 						Object: &v1.ObjectReference{
-							ObjectType: rel.OldSubjectType,
-							ObjectId:   rel.OldSubjectID,
+							ObjectType: rel.SubjectType,
+							ObjectId:   rel.SubjectID,
 						},
 					},
 				},
@@ -129,11 +129,11 @@ func (r *permissionRepo) SwapRelationship(ctx context.Context, rel *biz.SwapRela
 						ObjectType: rel.ResourceType,
 						ObjectId:   rel.ResourceID,
 					},
-					Relation: rel.Relation,
+					Relation: rel.NewRelation,
 					Subject: &v1.SubjectReference{
 						Object: &v1.ObjectReference{
-							ObjectType: rel.NewSubjectType,
-							ObjectId:   rel.NewSubjectID,
+							ObjectType: rel.SubjectType,
+							ObjectId:   rel.SubjectID,
 						},
 					},
 				},

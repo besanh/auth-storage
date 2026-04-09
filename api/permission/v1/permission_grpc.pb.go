@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Permission_CheckPermission_FullMethodName    = "/permission.v1.Permission/CheckPermission"
-	Permission_WriteRelationship_FullMethodName  = "/permission.v1.Permission/WriteRelationship"
-	Permission_DeleteRelationship_FullMethodName = "/permission.v1.Permission/DeleteRelationship"
-	Permission_SwapRelationship_FullMethodName   = "/permission.v1.Permission/SwapRelationship"
+	PermissionService_CheckPermission_FullMethodName    = "/permission.v1.PermissionService/CheckPermission"
+	PermissionService_WriteRelationship_FullMethodName  = "/permission.v1.PermissionService/WriteRelationship"
+	PermissionService_DeleteRelationship_FullMethodName = "/permission.v1.PermissionService/DeleteRelationship"
+	PermissionService_SwapRelationship_FullMethodName   = "/permission.v1.PermissionService/SwapRelationship"
 )
 
-// PermissionClient is the client API for Permission service.
+// PermissionServiceClient is the client API for PermissionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PermissionClient interface {
+type PermissionServiceClient interface {
 	// Internal API: Asks SpiceDB if a subject can perform an action
 	CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionReply, error)
 	// Internal API: Tells SpiceDB to create a new ownership/parent tuple
@@ -37,201 +37,201 @@ type PermissionClient interface {
 	SwapRelationship(ctx context.Context, in *SwapRelationshipRequest, opts ...grpc.CallOption) (*SwapRelationshipReply, error)
 }
 
-type permissionClient struct {
+type permissionServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPermissionClient(cc grpc.ClientConnInterface) PermissionClient {
-	return &permissionClient{cc}
+func NewPermissionServiceClient(cc grpc.ClientConnInterface) PermissionServiceClient {
+	return &permissionServiceClient{cc}
 }
 
-func (c *permissionClient) CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionReply, error) {
+func (c *permissionServiceClient) CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CheckPermissionReply)
-	err := c.cc.Invoke(ctx, Permission_CheckPermission_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PermissionService_CheckPermission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *permissionClient) WriteRelationship(ctx context.Context, in *WriteRelationshipRequest, opts ...grpc.CallOption) (*WriteRelationshipReply, error) {
+func (c *permissionServiceClient) WriteRelationship(ctx context.Context, in *WriteRelationshipRequest, opts ...grpc.CallOption) (*WriteRelationshipReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WriteRelationshipReply)
-	err := c.cc.Invoke(ctx, Permission_WriteRelationship_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PermissionService_WriteRelationship_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *permissionClient) DeleteRelationship(ctx context.Context, in *DeleteRelationshipRequest, opts ...grpc.CallOption) (*DeleteRelationshipReply, error) {
+func (c *permissionServiceClient) DeleteRelationship(ctx context.Context, in *DeleteRelationshipRequest, opts ...grpc.CallOption) (*DeleteRelationshipReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteRelationshipReply)
-	err := c.cc.Invoke(ctx, Permission_DeleteRelationship_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PermissionService_DeleteRelationship_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *permissionClient) SwapRelationship(ctx context.Context, in *SwapRelationshipRequest, opts ...grpc.CallOption) (*SwapRelationshipReply, error) {
+func (c *permissionServiceClient) SwapRelationship(ctx context.Context, in *SwapRelationshipRequest, opts ...grpc.CallOption) (*SwapRelationshipReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SwapRelationshipReply)
-	err := c.cc.Invoke(ctx, Permission_SwapRelationship_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PermissionService_SwapRelationship_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PermissionServer is the server API for Permission service.
-// All implementations must embed UnimplementedPermissionServer
+// PermissionServiceServer is the server API for PermissionService service.
+// All implementations must embed UnimplementedPermissionServiceServer
 // for forward compatibility.
-type PermissionServer interface {
+type PermissionServiceServer interface {
 	// Internal API: Asks SpiceDB if a subject can perform an action
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error)
 	// Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error)
 	DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error)
 	SwapRelationship(context.Context, *SwapRelationshipRequest) (*SwapRelationshipReply, error)
-	mustEmbedUnimplementedPermissionServer()
+	mustEmbedUnimplementedPermissionServiceServer()
 }
 
-// UnimplementedPermissionServer must be embedded to have
+// UnimplementedPermissionServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedPermissionServer struct{}
+type UnimplementedPermissionServiceServer struct{}
 
-func (UnimplementedPermissionServer) CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error) {
+func (UnimplementedPermissionServiceServer) CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckPermission not implemented")
 }
-func (UnimplementedPermissionServer) WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error) {
+func (UnimplementedPermissionServiceServer) WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method WriteRelationship not implemented")
 }
-func (UnimplementedPermissionServer) DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error) {
+func (UnimplementedPermissionServiceServer) DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteRelationship not implemented")
 }
-func (UnimplementedPermissionServer) SwapRelationship(context.Context, *SwapRelationshipRequest) (*SwapRelationshipReply, error) {
+func (UnimplementedPermissionServiceServer) SwapRelationship(context.Context, *SwapRelationshipRequest) (*SwapRelationshipReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method SwapRelationship not implemented")
 }
-func (UnimplementedPermissionServer) mustEmbedUnimplementedPermissionServer() {}
-func (UnimplementedPermissionServer) testEmbeddedByValue()                    {}
+func (UnimplementedPermissionServiceServer) mustEmbedUnimplementedPermissionServiceServer() {}
+func (UnimplementedPermissionServiceServer) testEmbeddedByValue()                           {}
 
-// UnsafePermissionServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PermissionServer will
+// UnsafePermissionServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PermissionServiceServer will
 // result in compilation errors.
-type UnsafePermissionServer interface {
-	mustEmbedUnimplementedPermissionServer()
+type UnsafePermissionServiceServer interface {
+	mustEmbedUnimplementedPermissionServiceServer()
 }
 
-func RegisterPermissionServer(s grpc.ServiceRegistrar, srv PermissionServer) {
-	// If the following call panics, it indicates UnimplementedPermissionServer was
+func RegisterPermissionServiceServer(s grpc.ServiceRegistrar, srv PermissionServiceServer) {
+	// If the following call panics, it indicates UnimplementedPermissionServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Permission_ServiceDesc, srv)
+	s.RegisterService(&PermissionService_ServiceDesc, srv)
 }
 
-func _Permission_CheckPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PermissionService_CheckPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckPermissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PermissionServer).CheckPermission(ctx, in)
+		return srv.(PermissionServiceServer).CheckPermission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Permission_CheckPermission_FullMethodName,
+		FullMethod: PermissionService_CheckPermission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServer).CheckPermission(ctx, req.(*CheckPermissionRequest))
+		return srv.(PermissionServiceServer).CheckPermission(ctx, req.(*CheckPermissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Permission_WriteRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PermissionService_WriteRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WriteRelationshipRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PermissionServer).WriteRelationship(ctx, in)
+		return srv.(PermissionServiceServer).WriteRelationship(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Permission_WriteRelationship_FullMethodName,
+		FullMethod: PermissionService_WriteRelationship_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServer).WriteRelationship(ctx, req.(*WriteRelationshipRequest))
+		return srv.(PermissionServiceServer).WriteRelationship(ctx, req.(*WriteRelationshipRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Permission_DeleteRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PermissionService_DeleteRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteRelationshipRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PermissionServer).DeleteRelationship(ctx, in)
+		return srv.(PermissionServiceServer).DeleteRelationship(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Permission_DeleteRelationship_FullMethodName,
+		FullMethod: PermissionService_DeleteRelationship_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServer).DeleteRelationship(ctx, req.(*DeleteRelationshipRequest))
+		return srv.(PermissionServiceServer).DeleteRelationship(ctx, req.(*DeleteRelationshipRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Permission_SwapRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PermissionService_SwapRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SwapRelationshipRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PermissionServer).SwapRelationship(ctx, in)
+		return srv.(PermissionServiceServer).SwapRelationship(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Permission_SwapRelationship_FullMethodName,
+		FullMethod: PermissionService_SwapRelationship_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServer).SwapRelationship(ctx, req.(*SwapRelationshipRequest))
+		return srv.(PermissionServiceServer).SwapRelationship(ctx, req.(*SwapRelationshipRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Permission_ServiceDesc is the grpc.ServiceDesc for Permission service.
+// PermissionService_ServiceDesc is the grpc.ServiceDesc for PermissionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Permission_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "permission.v1.Permission",
-	HandlerType: (*PermissionServer)(nil),
+var PermissionService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "permission.v1.PermissionService",
+	HandlerType: (*PermissionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CheckPermission",
-			Handler:    _Permission_CheckPermission_Handler,
+			Handler:    _PermissionService_CheckPermission_Handler,
 		},
 		{
 			MethodName: "WriteRelationship",
-			Handler:    _Permission_WriteRelationship_Handler,
+			Handler:    _PermissionService_WriteRelationship_Handler,
 		},
 		{
 			MethodName: "DeleteRelationship",
-			Handler:    _Permission_DeleteRelationship_Handler,
+			Handler:    _PermissionService_DeleteRelationship_Handler,
 		},
 		{
 			MethodName: "SwapRelationship",
-			Handler:    _Permission_SwapRelationship_Handler,
+			Handler:    _PermissionService_SwapRelationship_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

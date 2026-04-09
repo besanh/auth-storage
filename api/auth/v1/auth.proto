@@ -6,7 +6,7 @@ option go_package = "auth_storage/api/auth/v1";
 
 import "google/api/annotations.proto";
 
-service Auth {
+service AuthService {
     rpc Register (RegisterRequest) returns (RegisterReply) {
         option (google.api.http) = {
         post: "/v1/auth/register"

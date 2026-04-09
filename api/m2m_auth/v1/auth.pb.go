@@ -138,8 +138,8 @@ const file_m2m_auth_v1_auth_proto_rawDesc = "" +
 	"LoginReply\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12\x1d\n" +
 	"\n" +
-	"expires_in\x18\x02 \x01(\x03R\texpiresIn2b\n" +
-	"\x04Auth\x12Z\n" +
+	"expires_in\x18\x02 \x01(\x03R\texpiresIn2i\n" +
+	"\vAuthService\x12Z\n" +
 	"\x05Login\x12\x19.m2m_auth.v1.LoginRequest\x1a\x17.m2m_auth.v1.LoginReply\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/m2m/v1/auth/loginB\x1eZ\x1cauth_storage/api/m2m_auth/v1b\x06proto3"
 
 var (
@@ -160,8 +160,8 @@ var file_m2m_auth_v1_auth_proto_goTypes = []any{
 	(*LoginReply)(nil),   // 1: m2m_auth.v1.LoginReply
 }
 var file_m2m_auth_v1_auth_proto_depIdxs = []int32{
-	0, // 0: m2m_auth.v1.Auth.Login:input_type -> m2m_auth.v1.LoginRequest
-	1, // 1: m2m_auth.v1.Auth.Login:output_type -> m2m_auth.v1.LoginReply
+	0, // 0: m2m_auth.v1.AuthService.Login:input_type -> m2m_auth.v1.LoginRequest
+	1, // 1: m2m_auth.v1.AuthService.Login:output_type -> m2m_auth.v1.LoginReply
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

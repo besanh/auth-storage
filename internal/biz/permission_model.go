@@ -39,13 +39,10 @@ type DeleteRelationshipResponse struct {
 type SwapRelationshipRequest struct {
 	ResourceType string
 	ResourceID   string
-	Relation     string
-
-	OldSubjectType string
-	OldSubjectID   string
-
-	NewSubjectType string
-	NewSubjectID   string
+	SubjectType  string
+	SubjectID    string
+	OldRelation  string
+	NewRelation  string
 }
 
 type SwapRelationshipResponse struct {

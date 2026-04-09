@@ -7,7 +7,7 @@ import (
 )
 
 type AuthService struct {
-	v1.UnimplementedAuthServer
+	v1.UnimplementedAuthServiceServer
 	uc *biz.AuthUseCase
 }
 

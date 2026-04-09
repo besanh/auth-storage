@@ -10,7 +10,7 @@ import (
 )
 
 type M2MAuthService struct {
-	m2m_v1.UnimplementedAuthServer
+	m2m_v1.UnimplementedAuthServiceServer
 	uc  *biz.M2MAuthUseCase
 	log *log.Helper
 }

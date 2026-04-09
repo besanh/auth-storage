@@ -19,13 +19,13 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationAuthCheckPermission = "/auth.v1.Auth/CheckPermission"
-const OperationAuthLogin = "/auth.v1.Auth/Login"
-const OperationAuthLogout = "/auth.v1.Auth/Logout"
-const OperationAuthRefreshToken = "/auth.v1.Auth/RefreshToken"
-const OperationAuthRegister = "/auth.v1.Auth/Register"
+const OperationAuthServiceCheckPermission = "/auth.v1.AuthService/CheckPermission"
+const OperationAuthServiceLogin = "/auth.v1.AuthService/Login"
+const OperationAuthServiceLogout = "/auth.v1.AuthService/Logout"
+const OperationAuthServiceRefreshToken = "/auth.v1.AuthService/RefreshToken"
+const OperationAuthServiceRegister = "/auth.v1.AuthService/Register"
 
-type AuthHTTPServer interface {
+type AuthServiceHTTPServer interface {
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutReply, error)
@@ -33,16 +33,16 @@ type AuthHTTPServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 }
 
-func RegisterAuthHTTPServer(s *http.Server, srv AuthHTTPServer) {
+func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/v1/auth/register", _Auth_Register0_HTTP_Handler(srv))
-	r.POST("/v1/auth/login", _Auth_Login1_HTTP_Handler(srv))
-	r.POST("/v1/auth/refresh-token", _Auth_RefreshToken0_HTTP_Handler(srv))
-	r.POST("/v1/auth/logout", _Auth_Logout0_HTTP_Handler(srv))
-	r.POST("/v1/auth/check", _Auth_CheckPermission0_HTTP_Handler(srv))
+	r.POST("/v1/auth/register", _AuthService_Register0_HTTP_Handler(srv))
+	r.POST("/v1/auth/login", _AuthService_Login1_HTTP_Handler(srv))
+	r.POST("/v1/auth/refresh-token", _AuthService_RefreshToken0_HTTP_Handler(srv))
+	r.POST("/v1/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
+	r.POST("/v1/auth/check", _AuthService_CheckPermission0_HTTP_Handler(srv))
 }
 
-func _Auth_Register0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+func _AuthService_Register0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in RegisterRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -51,7 +51,7 @@ func _Auth_Register0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) err
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAuthRegister)
+		http.SetOperation(ctx, OperationAuthServiceRegister)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Register(ctx, req.(*RegisterRequest))
 		})
@@ -64,7 +64,7 @@ func _Auth_Register0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) err
 	}
 }
 
-func _Auth_Login1_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+func _AuthService_Login1_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in LoginRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -73,7 +73,7 @@ func _Auth_Login1_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error 
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAuthLogin)
+		http.SetOperation(ctx, OperationAuthServiceLogin)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Login(ctx, req.(*LoginRequest))
 		})
@@ -86,7 +86,7 @@ func _Auth_Login1_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error 
 	}
 }
 
-func _Auth_RefreshToken0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+func _AuthService_RefreshToken0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in RefreshTokenRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -95,7 +95,7 @@ func _Auth_RefreshToken0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context)
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAuthRefreshToken)
+		http.SetOperation(ctx, OperationAuthServiceRefreshToken)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.RefreshToken(ctx, req.(*RefreshTokenRequest))
 		})
@@ -108,7 +108,7 @@ func _Auth_RefreshToken0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context)
 	}
 }
 
-func _Auth_Logout0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+func _AuthService_Logout0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in LogoutRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -117,7 +117,7 @@ func _Auth_Logout0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAuthLogout)
+		http.SetOperation(ctx, OperationAuthServiceLogout)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Logout(ctx, req.(*LogoutRequest))
 		})
@@ -130,7 +130,7 @@ func _Auth_Logout0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error
 	}
 }
 
-func _Auth_CheckPermission0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+func _AuthService_CheckPermission0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in CheckPermissionRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -139,7 +139,7 @@ func _Auth_CheckPermission0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Conte
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAuthCheckPermission)
+		http.SetOperation(ctx, OperationAuthServiceCheckPermission)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.CheckPermission(ctx, req.(*CheckPermissionRequest))
 		})
@@ -152,7 +152,7 @@ func _Auth_CheckPermission0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Conte
 	}
 }
 
-type AuthHTTPClient interface {
+type AuthServiceHTTPClient interface {
 	CheckPermission(ctx context.Context, req *CheckPermissionRequest, opts ...http.CallOption) (rsp *CheckPermissionReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutReply, err error)
@@ -160,19 +160,19 @@ type AuthHTTPClient interface {
 	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 }
 
-type AuthHTTPClientImpl struct {
+type AuthServiceHTTPClientImpl struct {
 	cc *http.Client
 }
 
-func NewAuthHTTPClient(client *http.Client) AuthHTTPClient {
-	return &AuthHTTPClientImpl{client}
+func NewAuthServiceHTTPClient(client *http.Client) AuthServiceHTTPClient {
+	return &AuthServiceHTTPClientImpl{client}
 }
 
-func (c *AuthHTTPClientImpl) CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...http.CallOption) (*CheckPermissionReply, error) {
+func (c *AuthServiceHTTPClientImpl) CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...http.CallOption) (*CheckPermissionReply, error) {
 	var out CheckPermissionReply
 	pattern := "/v1/auth/check"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationAuthCheckPermission))
+	opts = append(opts, http.Operation(OperationAuthServiceCheckPermission))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -181,11 +181,11 @@ func (c *AuthHTTPClientImpl) CheckPermission(ctx context.Context, in *CheckPermi
 	return &out, nil
 }
 
-func (c *AuthHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
+func (c *AuthServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
 	var out LoginReply
 	pattern := "/v1/auth/login"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationAuthLogin))
+	opts = append(opts, http.Operation(OperationAuthServiceLogin))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -194,11 +194,11 @@ func (c *AuthHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts .
 	return &out, nil
 }
 
-func (c *AuthHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*LogoutReply, error) {
+func (c *AuthServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*LogoutReply, error) {
 	var out LogoutReply
 	pattern := "/v1/auth/logout"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationAuthLogout))
+	opts = append(opts, http.Operation(OperationAuthServiceLogout))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -207,11 +207,11 @@ func (c *AuthHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts
 	return &out, nil
 }
 
-func (c *AuthHTTPClientImpl) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...http.CallOption) (*RefreshTokenReply, error) {
+func (c *AuthServiceHTTPClientImpl) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...http.CallOption) (*RefreshTokenReply, error) {
 	var out RefreshTokenReply
 	pattern := "/v1/auth/refresh-token"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationAuthRefreshToken))
+	opts = append(opts, http.Operation(OperationAuthServiceRefreshToken))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -220,11 +220,11 @@ func (c *AuthHTTPClientImpl) RefreshToken(ctx context.Context, in *RefreshTokenR
 	return &out, nil
 }
 
-func (c *AuthHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
+func (c *AuthServiceHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
 	var out RegisterReply
 	pattern := "/v1/auth/register"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationAuthRegister))
+	opts = append(opts, http.Operation(OperationAuthServiceRegister))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
