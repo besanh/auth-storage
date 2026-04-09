@@ -30,7 +30,7 @@ func NewHTTPServer(c *conf.Server, logger log.Logger, auth *service.AuthService,
 	}
 	srv := http.NewServer(opts...)
 	authV1.RegisterAuthServiceHTTPServer(srv, auth)
-	m2mV1.RegisterAuthServiceHTTPServer(srv, m2mAuth)
+	m2mV1.RegisterM2MAuthServiceHTTPServer(srv, m2mAuth)
 	permissionV1.RegisterPermissionServiceHTTPServer(srv, permission)
 	return srv
 }

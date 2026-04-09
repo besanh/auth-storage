@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v6.33.2
-// source: m2m_auth/v1/auth.proto
+// source: m2m_auth/v1/m2m_auth.proto
 
 package v1
 
@@ -32,7 +32,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_m2m_auth_v1_auth_proto_msgTypes[0]
+	mi := &file_m2m_auth_v1_m2m_auth_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +44,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_m2m_auth_v1_auth_proto_msgTypes[0]
+	mi := &file_m2m_auth_v1_m2m_auth_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_m2m_auth_v1_auth_proto_rawDescGZIP(), []int{0}
+	return file_m2m_auth_v1_m2m_auth_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *LoginRequest) GetClientId() string {
@@ -84,7 +84,7 @@ type LoginReply struct {
 
 func (x *LoginReply) Reset() {
 	*x = LoginReply{}
-	mi := &file_m2m_auth_v1_auth_proto_msgTypes[1]
+	mi := &file_m2m_auth_v1_m2m_auth_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +96,7 @@ func (x *LoginReply) String() string {
 func (*LoginReply) ProtoMessage() {}
 
 func (x *LoginReply) ProtoReflect() protoreflect.Message {
-	mi := &file_m2m_auth_v1_auth_proto_msgTypes[1]
+	mi := &file_m2m_auth_v1_m2m_auth_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +109,7 @@ func (x *LoginReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginReply.ProtoReflect.Descriptor instead.
 func (*LoginReply) Descriptor() ([]byte, []int) {
-	return file_m2m_auth_v1_auth_proto_rawDescGZIP(), []int{1}
+	return file_m2m_auth_v1_m2m_auth_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *LoginReply) GetAccessToken() string {
@@ -126,11 +126,11 @@ func (x *LoginReply) GetExpiresIn() int64 {
 	return 0
 }
 
-var File_m2m_auth_v1_auth_proto protoreflect.FileDescriptor
+var File_m2m_auth_v1_m2m_auth_proto protoreflect.FileDescriptor
 
-const file_m2m_auth_v1_auth_proto_rawDesc = "" +
+const file_m2m_auth_v1_m2m_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x16m2m_auth/v1/auth.proto\x12\vm2m_auth.v1\x1a\x1cgoogle/api/annotations.proto\"P\n" +
+	"\x1am2m_auth/v1/m2m_auth.proto\x12\vm2m_auth.v1\x1a\x1cgoogle/api/annotations.proto\"P\n" +
 	"\fLoginRequest\x12\x1b\n" +
 	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12#\n" +
 	"\rclient_secret\x18\x02 \x01(\tR\fclientSecret\"N\n" +
@@ -138,30 +138,30 @@ const file_m2m_auth_v1_auth_proto_rawDesc = "" +
 	"LoginReply\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12\x1d\n" +
 	"\n" +
-	"expires_in\x18\x02 \x01(\x03R\texpiresIn2i\n" +
-	"\vAuthService\x12Z\n" +
+	"expires_in\x18\x02 \x01(\x03R\texpiresIn2l\n" +
+	"\x0eM2MAuthService\x12Z\n" +
 	"\x05Login\x12\x19.m2m_auth.v1.LoginRequest\x1a\x17.m2m_auth.v1.LoginReply\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/m2m/v1/auth/loginB\x1eZ\x1cauth_storage/api/m2m_auth/v1b\x06proto3"
 
 var (
-	file_m2m_auth_v1_auth_proto_rawDescOnce sync.Once
-	file_m2m_auth_v1_auth_proto_rawDescData []byte
+	file_m2m_auth_v1_m2m_auth_proto_rawDescOnce sync.Once
+	file_m2m_auth_v1_m2m_auth_proto_rawDescData []byte
 )
 
-func file_m2m_auth_v1_auth_proto_rawDescGZIP() []byte {
-	file_m2m_auth_v1_auth_proto_rawDescOnce.Do(func() {
-		file_m2m_auth_v1_auth_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_m2m_auth_v1_auth_proto_rawDesc), len(file_m2m_auth_v1_auth_proto_rawDesc)))
+func file_m2m_auth_v1_m2m_auth_proto_rawDescGZIP() []byte {
+	file_m2m_auth_v1_m2m_auth_proto_rawDescOnce.Do(func() {
+		file_m2m_auth_v1_m2m_auth_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_m2m_auth_v1_m2m_auth_proto_rawDesc), len(file_m2m_auth_v1_m2m_auth_proto_rawDesc)))
 	})
-	return file_m2m_auth_v1_auth_proto_rawDescData
+	return file_m2m_auth_v1_m2m_auth_proto_rawDescData
 }
 
-var file_m2m_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_m2m_auth_v1_auth_proto_goTypes = []any{
+var file_m2m_auth_v1_m2m_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_m2m_auth_v1_m2m_auth_proto_goTypes = []any{
 	(*LoginRequest)(nil), // 0: m2m_auth.v1.LoginRequest
 	(*LoginReply)(nil),   // 1: m2m_auth.v1.LoginReply
 }
-var file_m2m_auth_v1_auth_proto_depIdxs = []int32{
-	0, // 0: m2m_auth.v1.AuthService.Login:input_type -> m2m_auth.v1.LoginRequest
-	1, // 1: m2m_auth.v1.AuthService.Login:output_type -> m2m_auth.v1.LoginReply
+var file_m2m_auth_v1_m2m_auth_proto_depIdxs = []int32{
+	0, // 0: m2m_auth.v1.M2MAuthService.Login:input_type -> m2m_auth.v1.LoginRequest
+	1, // 1: m2m_auth.v1.M2MAuthService.Login:output_type -> m2m_auth.v1.LoginReply
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -169,26 +169,26 @@ var file_m2m_auth_v1_auth_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_m2m_auth_v1_auth_proto_init() }
-func file_m2m_auth_v1_auth_proto_init() {
-	if File_m2m_auth_v1_auth_proto != nil {
+func init() { file_m2m_auth_v1_m2m_auth_proto_init() }
+func file_m2m_auth_v1_m2m_auth_proto_init() {
+	if File_m2m_auth_v1_m2m_auth_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_m2m_auth_v1_auth_proto_rawDesc), len(file_m2m_auth_v1_auth_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_m2m_auth_v1_m2m_auth_proto_rawDesc), len(file_m2m_auth_v1_m2m_auth_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_m2m_auth_v1_auth_proto_goTypes,
-		DependencyIndexes: file_m2m_auth_v1_auth_proto_depIdxs,
-		MessageInfos:      file_m2m_auth_v1_auth_proto_msgTypes,
+		GoTypes:           file_m2m_auth_v1_m2m_auth_proto_goTypes,
+		DependencyIndexes: file_m2m_auth_v1_m2m_auth_proto_depIdxs,
+		MessageInfos:      file_m2m_auth_v1_m2m_auth_proto_msgTypes,
 	}.Build()
-	File_m2m_auth_v1_auth_proto = out.File
-	file_m2m_auth_v1_auth_proto_goTypes = nil
-	file_m2m_auth_v1_auth_proto_depIdxs = nil
+	File_m2m_auth_v1_m2m_auth_proto = out.File
+	file_m2m_auth_v1_m2m_auth_proto_goTypes = nil
+	file_m2m_auth_v1_m2m_auth_proto_depIdxs = nil
 }

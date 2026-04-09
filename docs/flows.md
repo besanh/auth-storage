@@ -164,4 +164,52 @@ Before allowing a user to read or modify a file/folder.
     *   `subject_id`: `[user_id]`
 2.  **App Logic**: Proceed with the database operation ONLY if `Allowed: true`.
 
+## 7. Share Link Management
+Allows users to create public or semi-private access tokens for specific resources.
+
+### 7.1 Creating a Share Link
+```mermaid
+sequenceDiagram
+    participant Client as User Client
+    participant Service as ShareService
+    participant DB as Postgres
+    participant SpiceDB as PermissionService
+
+    Client->>Service: CreateShareLink(resource_id, permission)
+    Service->>Service: Generate unique link_token
+    Service->>DB: Save ShareLink metadata (token, expires_at)
+    Service->>SpiceDB: WriteRelationship(subject_type: "share_link", subject_id: token, relation: permission)
+    Service-->>Client: CreateShareLinkResponse(token)
+```
+
+### 7.2 Revoking a Share Link
+```mermaid
+sequenceDiagram
+    participant Client as Creator Client
+    participant Service as ShareService
+    participant DB as Postgres
+    participant SpiceDB as PermissionService
+
+    Client->>Service: RevokeShareLink(token)
+    Service->>DB: Delete ShareLink record
+    Service->>SpiceDB: DeleteRelationship(subject_type: "share_link", subject_id: token)
+    Service-->>Client: RevokeShareLinkResponse(token)
+```
+
+## 8. Accessing Resource via Share Link
+How downstream services (like `file-service`) validate access from a public link.
+
+```mermaid
+sequenceDiagram
+    participant Guest as Anonymous/Guest Client
+    participant App as File Service
+    participant SpiceDB as PermissionService
+
+    Guest->>App: GET /file/summary?token=LINK_TOKEN
+    Note over App: Detects link token in query/header
+    App->>SpiceDB: CheckPermission(subject_type: "share_link", subject_id: LINK_TOKEN, relation: "viewer", resource: "file-123")
+    SpiceDB-->>App: { "allowed": true }
+    App-->>Guest: File Content
+```
+
 

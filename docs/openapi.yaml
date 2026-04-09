@@ -9,8 +9,8 @@ paths:
     /m2m/v1/auth/login:
         post:
             tags:
-                - AuthService
-            operationId: AuthService_Login
+                - M2MAuthService
+            operationId: M2MAuthService_Login
             requestBody:
                 content:
                     application/json:
@@ -356,5 +356,5 @@ components:
                     type: string
 tags:
     - name: AuthService
-    - name: AuthService
+    - name: M2MAuthService
     - name: PermissionService

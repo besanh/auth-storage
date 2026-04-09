@@ -58,3 +58,32 @@ When a service creates a new resource (e.g., a Folder), it must register the own
 1.  **Extracting Subject**: In your Go code, use `biz.ExtractSubject(ctx)` to safely retrieve the `sub` (UserID or ClientID) from the incoming JWT without worrying about the underlying claim type.
 2.  **Inheritance**: When creating resources inside a container (e.g., a file inside a folder), write a `parent` relationship to SpiceDB so permissions automatically flow down.
 3.  **Token Rotation**: Always handle `401 Unauthorized` by attempting to use the `refresh_token` before forcing a user logout.
+
+---
+
+## 4. Link-Based Authorization (Shared Links)
+
+The `ShareService` allows creating public or restricted links for resources. These are validated using the `Permission` API by treating the link token as the `subject`.
+
+### Using a Share Link
+When a request arrives with a `token` (e.g., from a query parameter or a specific header):
+
+1.  **Extract the Token**: Identify the link token provided by the user.
+2.  **Verify via Permission Service**:
+    *   **Endpoint**: `POST /v1/internal/permissions/check`
+    *   **Payload**:
+    ```json
+    {
+        "resource_type": "file",
+        "resource_id": "file-uuid",
+        "relation": "viewer",
+        "subject_type": "share_link",
+        "subject_id": "LINK_TOKEN_HERE"
+    }
+    ```
+3.  **Handle Success**: If `allowed: true`, proceed with the requested operation.
+
+### Managing Links
+*   **Create**: Use `POST /v1/shares/create` to generate a new token and automatically register it in SpiceDB.
+*   **Revoke**: Use `POST /v1/shares/revoke` to delete the token. Access will be immediately denied by the Permission service.
+*   **Update**: Use `POST /v1/shares/update` to change the permission level (e.g., from `viewer` to `editor`) for an existing link.

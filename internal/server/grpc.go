@@ -30,7 +30,7 @@ func NewGRPCServer(c *conf.Server, logger log.Logger, auth *service.AuthService,
 	}
 	srv := grpc.NewServer(opts...)
 	authV1.RegisterAuthServiceServer(srv, auth)
-	m2mV1.RegisterAuthServiceServer(srv, m2mAuth)
+	m2mV1.RegisterM2MAuthServiceServer(srv, m2mAuth)
 	permissionV1.RegisterPermissionServiceServer(srv, permission)
 	return srv
 }
