@@ -29,6 +29,13 @@ service Permission {
             body: "*"
         };
     }
+
+    rpc SwapRelationship (SwapRelationshipRequest) returns (SwapRelationshipReply) {
+        option (google.api.http) = {
+            post: "/v1/internal/permissions/swap"
+            body: "*"
+        };
+    }
 }
 
 message CheckPermissionRequest {
@@ -64,5 +71,23 @@ message DeleteRelationshipRequest {
 }
 
 message DeleteRelationshipReply {
+    bool success = 1;
+}
+
+message SwapRelationshipRequest {
+    string resource_type = 1; // e.g., "file"
+    string resource_id = 2;   // e.g., "file-999"
+    string relation = 3;      // e.g., "viewer"
+    
+    // Old subject to remove
+    string old_subject_type = 4;
+    string old_subject_id = 5;
+    
+    // New subject to add
+    string new_subject_type = 6;
+    string new_subject_id = 7;
+}
+
+message SwapRelationshipReply {
     bool success = 1;
 }

@@ -68,3 +68,21 @@ func (s *PermissionService) DeleteRelationship(ctx context.Context, req *v1.Dele
 		Success: resp.Success,
 	}, nil
 }
+func (s *PermissionService) SwapRelationship(ctx context.Context, req *v1.SwapRelationshipRequest) (*v1.SwapRelationshipReply, error) {
+	resp, err := s.uc.SwapRelationship(ctx, &biz.SwapRelationshipRequest{
+		ResourceType:   req.GetResourceType(),
+		ResourceID:     req.GetResourceId(),
+		Relation:       req.GetRelation(),
+		OldSubjectType: req.GetOldSubjectType(),
+		OldSubjectID:   req.GetOldSubjectId(),
+		NewSubjectType: req.GetNewSubjectType(),
+		NewSubjectID:   req.GetNewSubjectId(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.SwapRelationshipReply{
+		Success: resp.Success,
+	}, nil
+}

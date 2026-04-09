@@ -35,3 +35,19 @@ type DeleteRelationshipRequest struct {
 type DeleteRelationshipResponse struct {
 	Success bool
 }
+
+type SwapRelationshipRequest struct {
+	ResourceType string
+	ResourceID   string
+	Relation     string
+
+	OldSubjectType string
+	OldSubjectID   string
+
+	NewSubjectType string
+	NewSubjectID   string
+}
+
+type SwapRelationshipResponse struct {
+	Success bool
+}

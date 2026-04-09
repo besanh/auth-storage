@@ -22,6 +22,7 @@ const (
 	Permission_CheckPermission_FullMethodName    = "/permission.v1.Permission/CheckPermission"
 	Permission_WriteRelationship_FullMethodName  = "/permission.v1.Permission/WriteRelationship"
 	Permission_DeleteRelationship_FullMethodName = "/permission.v1.Permission/DeleteRelationship"
+	Permission_SwapRelationship_FullMethodName   = "/permission.v1.Permission/SwapRelationship"
 )
 
 // PermissionClient is the client API for Permission service.
@@ -33,6 +34,7 @@ type PermissionClient interface {
 	// Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(ctx context.Context, in *WriteRelationshipRequest, opts ...grpc.CallOption) (*WriteRelationshipReply, error)
 	DeleteRelationship(ctx context.Context, in *DeleteRelationshipRequest, opts ...grpc.CallOption) (*DeleteRelationshipReply, error)
+	SwapRelationship(ctx context.Context, in *SwapRelationshipRequest, opts ...grpc.CallOption) (*SwapRelationshipReply, error)
 }
 
 type permissionClient struct {
@@ -73,6 +75,16 @@ func (c *permissionClient) DeleteRelationship(ctx context.Context, in *DeleteRel
 	return out, nil
 }
 
+func (c *permissionClient) SwapRelationship(ctx context.Context, in *SwapRelationshipRequest, opts ...grpc.CallOption) (*SwapRelationshipReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SwapRelationshipReply)
+	err := c.cc.Invoke(ctx, Permission_SwapRelationship_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PermissionServer is the server API for Permission service.
 // All implementations must embed UnimplementedPermissionServer
 // for forward compatibility.
@@ -82,6 +94,7 @@ type PermissionServer interface {
 	// Internal API: Tells SpiceDB to create a new ownership/parent tuple
 	WriteRelationship(context.Context, *WriteRelationshipRequest) (*WriteRelationshipReply, error)
 	DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error)
+	SwapRelationship(context.Context, *SwapRelationshipRequest) (*SwapRelationshipReply, error)
 	mustEmbedUnimplementedPermissionServer()
 }
 
@@ -100,6 +113,9 @@ func (UnimplementedPermissionServer) WriteRelationship(context.Context, *WriteRe
 }
 func (UnimplementedPermissionServer) DeleteRelationship(context.Context, *DeleteRelationshipRequest) (*DeleteRelationshipReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteRelationship not implemented")
+}
+func (UnimplementedPermissionServer) SwapRelationship(context.Context, *SwapRelationshipRequest) (*SwapRelationshipReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method SwapRelationship not implemented")
 }
 func (UnimplementedPermissionServer) mustEmbedUnimplementedPermissionServer() {}
 func (UnimplementedPermissionServer) testEmbeddedByValue()                    {}
@@ -176,6 +192,24 @@ func _Permission_DeleteRelationship_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Permission_SwapRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SwapRelationshipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServer).SwapRelationship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Permission_SwapRelationship_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServer).SwapRelationship(ctx, req.(*SwapRelationshipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Permission_ServiceDesc is the grpc.ServiceDesc for Permission service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -194,6 +228,10 @@ var Permission_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteRelationship",
 			Handler:    _Permission_DeleteRelationship_Handler,
+		},
+		{
+			MethodName: "SwapRelationship",
+			Handler:    _Permission_SwapRelationship_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

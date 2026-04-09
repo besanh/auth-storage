@@ -151,6 +151,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/permission.v1.DeleteRelationshipReply'
+    /v1/internal/permissions/swap:
+        post:
+            tags:
+                - Permission
+            operationId: Permission_SwapRelationship
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/permission.v1.SwapRelationshipRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/permission.v1.SwapRelationshipReply'
     /v1/internal/permissions/write:
         post:
             tags:
@@ -295,6 +313,30 @@ components:
                 subjectType:
                     type: string
                 subjectId:
+                    type: string
+        permission.v1.SwapRelationshipReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        permission.v1.SwapRelationshipRequest:
+            type: object
+            properties:
+                resourceType:
+                    type: string
+                resourceId:
+                    type: string
+                relation:
+                    type: string
+                oldSubjectType:
+                    type: string
+                    description: Old subject to remove
+                oldSubjectId:
+                    type: string
+                newSubjectType:
+                    type: string
+                    description: New subject to add
+                newSubjectId:
                     type: string
         permission.v1.WriteRelationshipReply:
             type: object
