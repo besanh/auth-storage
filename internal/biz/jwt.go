@@ -1,10 +1,12 @@
 package biz
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -30,16 +32,16 @@ func (uc *AuthUseCase) GenerateToken(req *GenerateTokenRequest) (*GenerateTokenR
 			Type: "user",
 			ID:   req.UserID,
 		},
-		RegisteredClaims: jwt.RegisteredClaims{
+		RegisteredClaims: jwtv5.RegisteredClaims{
 			Subject:   req.UserID,
 			Issuer:    IssuerName,
-			ExpiresAt: jwt.NewNumericDate(now.Add(AccessTokenTTL)),
-			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwtv5.NewNumericDate(now.Add(AccessTokenTTL)),
+			IssuedAt:  jwtv5.NewNumericDate(now),
 			ID:        uuid.New().String(),
 			Audience:  []string{IssuerName},
 		},
 	}
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodRS256, accessClaims)
+	accessToken := jwtv5.NewWithClaims(jwtv5.SigningMethodRS256, accessClaims)
 	accessToken.Header["kid"] = uc.conf.Kid
 	signedAccess, err := accessToken.SignedString(uc.privateKey)
 	if err != nil {
@@ -54,16 +56,16 @@ func (uc *AuthUseCase) GenerateToken(req *GenerateTokenRequest) (*GenerateTokenR
 			Type: "user",
 			ID:   req.UserID,
 		},
-		RegisteredClaims: jwt.RegisteredClaims{
+		RegisteredClaims: jwtv5.RegisteredClaims{
 			Subject:   req.UserID,
 			Issuer:    IssuerName,
-			ExpiresAt: jwt.NewNumericDate(now.Add(RefreshTokenTTL)),
-			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwtv5.NewNumericDate(now.Add(RefreshTokenTTL)),
+			IssuedAt:  jwtv5.NewNumericDate(now),
 			ID:        uuid.New().String(),
 			Audience:  []string{IssuerName},
 		},
 	}
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshClaims)
+	refreshToken := jwtv5.NewWithClaims(jwtv5.SigningMethodRS256, refreshClaims)
 	refreshToken.Header["kid"] = uc.conf.Kid
 	signedRefresh, err := refreshToken.SignedString(uc.privateKey)
 	if err != nil {
@@ -75,4 +77,13 @@ func (uc *AuthUseCase) GenerateToken(req *GenerateTokenRequest) (*GenerateTokenR
 		RefreshToken: signedRefresh,
 		ExpiresAt:    accessClaims.ExpiresAt.Time.Unix(),
 	}, nil
+}
+
+func FromContext(ctx context.Context) (string, bool) {
+	if claims, ok := jwt.FromContext(ctx); ok {
+		if c, ok := claims.(*CustomClaims); ok {
+			return c.Subject, true
+		}
+	}
+	return "", false
 }

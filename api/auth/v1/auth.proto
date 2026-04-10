@@ -37,6 +37,24 @@ service AuthService {
         body: "*"
         };
     }
+    rpc GetUser (GetUserRequest) returns (GetUserReply) {
+        option (google.api.http) = {
+            get: "/v1/user"
+        };
+    }
+}
+
+message GetUserRequest {
+    string user_id = 1;
+}
+
+message GetUserReply {
+    string user_id = 1;
+    string email = 2;
+    string role = 3;
+    string scope = 4;
+    string status = 5;
+    string created_at = 6;
 }
 
 message RegisterRequest {

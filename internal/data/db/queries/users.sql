@@ -5,6 +5,8 @@ INSERT INTO users (
     status,
     role,
     scope,
+    name,
+    avatar_url,
     created_at,
     updated_at
 ) VALUES (
@@ -13,8 +15,10 @@ INSERT INTO users (
     $3,
     $4,
     $5,
+    $6,
+    $7,
     now(),
-    $6
+    $8
 ) RETURNING *;
 
 -- name: GetUserByEmail :one
@@ -30,3 +34,12 @@ RETURNING *;
 
 -- name: GetUserByID :one
 SELECT * FROM users WHERE id = $1;
+
+-- name: UpdateUserProfile :one
+UPDATE users
+SET
+    name = $2,
+    avatar_url = $3,
+    updated_at = now()
+WHERE id = $1
+RETURNING *;

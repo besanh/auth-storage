@@ -188,6 +188,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/permission.v1.WriteRelationshipReply'
+    /v1/user:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetUser
+            parameters:
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/auth.v1.GetUserReply'
 components:
     schemas:
         auth.v1.CheckPermissionReply:
@@ -207,6 +224,21 @@ components:
                 objectType:
                     type: string
                 objectId:
+                    type: string
+        auth.v1.GetUserReply:
+            type: object
+            properties:
+                userId:
+                    type: string
+                email:
+                    type: string
+                role:
+                    type: string
+                scope:
+                    type: string
+                status:
+                    type: string
+                createdAt:
                     type: string
         auth.v1.LoginReply:
             type: object

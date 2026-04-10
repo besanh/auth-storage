@@ -45,7 +45,7 @@ func (r *userRepo) InsertUser(ctx context.Context, in *db.User) (*db.User, error
 }
 
 func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*db.User, error) {
-	resp, err := r.data.Query.GetUserByEmail(ctx, sql.NullString{String: email, Valid: true})
+	resp, err := r.data.Query.GetUserByEmail(ctx, email)
 	if err == sql.ErrNoRows {
 		return nil, ErrUserNotFound
 	}
@@ -58,7 +58,7 @@ func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*db.User, 
 func (r *userRepo) UpdatePasswordHash(ctx context.Context, id string, passwordHash string) (*db.User, error) {
 	resp, err := r.data.Query.UpdatePasswordHash(ctx, db.UpdatePasswordHashParams{
 		ID:           uuid.Must(uuid.Parse(id)),
-		PasswordHash: sql.NullString{String: passwordHash, Valid: true},
+		PasswordHash: passwordHash,
 	})
 	if err == sql.ErrNoRows {
 		return nil, ErrUserNotFound

@@ -2,11 +2,13 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY DEFAULT uuidv7(),
-  email TEXT UNIQUE,
-  password_hash TEXT,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT NOT NULL,
+  avatar_url TEXT,
   role TEXT NOT NULL,
   scope TEXT NOT NULL,
-  status TEXT,
+  status TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ
 );

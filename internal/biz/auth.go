@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 	"crypto/rsa"
-	"database/sql"
 	"fmt"
 	"server/internal/conf"
 	db "server/internal/data/db/generated"
@@ -74,8 +73,8 @@ func (uc *AuthUseCase) Register(ctx context.Context, req *RegisterRequest) (*Reg
 	if err = uc.tm.ExecTx(ctx, func(ctx context.Context) error {
 		var err error
 		user, err = uc.authRepo.InsertUser(ctx, &db.User{
-			Email:        sql.NullString{String: req.Email, Valid: true},
-			PasswordHash: sql.NullString{String: string(hash), Valid: true},
+			Email:        req.Email,
+			PasswordHash: string(hash),
 			Role:         "user",
 			Scope:        "",
 		})
@@ -113,7 +112,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, req *LoginRequest) (*LoginResp
 	}
 
 	// 2. Verify password
-	if err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash.String), []byte(req.Password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 		return nil, fmt.Errorf("invalid password")
 	}
 
@@ -243,5 +242,20 @@ func (uc *AuthUseCase) CheckPermission(ctx context.Context, req *CheckPermission
 
 	return &CheckPermissionResponse{
 		Allowed: resp.Allowed,
+	}, nil
+}
+
+func (uc *AuthUseCase) GetUser(ctx context.Context, id string) (*GetUserResponse, error) {
+	user, err := uc.authRepo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &GetUserResponse{
+		ID:        user.ID.String(),
+		Email:     user.Email,
+		Role:      user.Role,
+		Scope:     user.Scope,
+		Status:    user.Status,
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 	}, nil
 }

@@ -22,11 +22,13 @@ type MachineClient struct {
 
 type User struct {
 	ID           uuid.UUID      `json:"id"`
-	Email        sql.NullString `json:"email"`
-	PasswordHash sql.NullString `json:"password_hash"`
+	Email        string         `json:"email"`
+	PasswordHash string         `json:"password_hash"`
+	Name         string         `json:"name"`
+	AvatarUrl    sql.NullString `json:"avatar_url"`
 	Role         string         `json:"role"`
 	Scope        string         `json:"scope"`
-	Status       sql.NullString `json:"status"`
+	Status       string         `json:"status"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
 }

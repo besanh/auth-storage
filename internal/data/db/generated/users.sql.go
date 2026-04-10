@@ -13,16 +13,18 @@ import (
 )
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, role, scope, status, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, password_hash, name, avatar_url, role, scope, status, created_at, updated_at FROM users WHERE email = $1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email sql.NullString) (User, error) {
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Name,
+		&i.AvatarUrl,
 		&i.Role,
 		&i.Scope,
 		&i.Status,
@@ -33,7 +35,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email sql.NullString) (Use
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, password_hash, role, scope, status, created_at, updated_at FROM users WHERE id = $1
+SELECT id, email, password_hash, name, avatar_url, role, scope, status, created_at, updated_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -43,6 +45,8 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Name,
+		&i.AvatarUrl,
 		&i.Role,
 		&i.Scope,
 		&i.Status,
@@ -59,6 +63,8 @@ INSERT INTO users (
     status,
     role,
     scope,
+    name,
+    avatar_url,
     created_at,
     updated_at
 ) VALUES (
@@ -67,17 +73,21 @@ INSERT INTO users (
     $3,
     $4,
     $5,
+    $6,
+    $7,
     now(),
-    $6
-) RETURNING id, email, password_hash, role, scope, status, created_at, updated_at
+    $8
+) RETURNING id, email, password_hash, name, avatar_url, role, scope, status, created_at, updated_at
 `
 
 type InsertUserParams struct {
-	Email        sql.NullString `json:"email"`
-	PasswordHash sql.NullString `json:"password_hash"`
-	Status       sql.NullString `json:"status"`
+	Email        string         `json:"email"`
+	PasswordHash string         `json:"password_hash"`
+	Status       string         `json:"status"`
 	Role         string         `json:"role"`
 	Scope        string         `json:"scope"`
+	Name         string         `json:"name"`
+	AvatarUrl    sql.NullString `json:"avatar_url"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
 }
 
@@ -88,6 +98,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		arg.Status,
 		arg.Role,
 		arg.Scope,
+		arg.Name,
+		arg.AvatarUrl,
 		arg.UpdatedAt,
 	)
 	var i User
@@ -95,6 +107,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Name,
+		&i.AvatarUrl,
 		&i.Role,
 		&i.Scope,
 		&i.Status,
@@ -110,12 +124,12 @@ SET
     password_hash = $2,
     updated_at = now()
 WHERE id = $1
-RETURNING id, email, password_hash, role, scope, status, created_at, updated_at
+RETURNING id, email, password_hash, name, avatar_url, role, scope, status, created_at, updated_at
 `
 
 type UpdatePasswordHashParams struct {
-	ID           uuid.UUID      `json:"id"`
-	PasswordHash sql.NullString `json:"password_hash"`
+	ID           uuid.UUID `json:"id"`
+	PasswordHash string    `json:"password_hash"`
 }
 
 func (q *Queries) UpdatePasswordHash(ctx context.Context, arg UpdatePasswordHashParams) (User, error) {
@@ -125,6 +139,42 @@ func (q *Queries) UpdatePasswordHash(ctx context.Context, arg UpdatePasswordHash
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Name,
+		&i.AvatarUrl,
+		&i.Role,
+		&i.Scope,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :one
+UPDATE users
+SET
+    name = $2,
+    avatar_url = $3,
+    updated_at = now()
+WHERE id = $1
+RETURNING id, email, password_hash, name, avatar_url, role, scope, status, created_at, updated_at
+`
+
+type UpdateUserProfileParams struct {
+	ID        uuid.UUID      `json:"id"`
+	Name      string         `json:"name"`
+	AvatarUrl sql.NullString `json:"avatar_url"`
+}
+
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserProfile, arg.ID, arg.Name, arg.AvatarUrl)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.PasswordHash,
+		&i.Name,
+		&i.AvatarUrl,
 		&i.Role,
 		&i.Scope,
 		&i.Status,

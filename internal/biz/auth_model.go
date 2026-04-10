@@ -39,3 +39,29 @@ type LogoutRequest struct {
 type LogoutResponse struct {
 	Success bool
 }
+
+type GetUserRequest struct {
+	UserID string
+}
+
+type GetUserResponse struct {
+	ID        string
+	Email     string
+	Role      string
+	Scope     string
+	Status    string
+	CreatedAt string
+}
+
+type GetProfileRequest struct {
+	UserID string
+}
+
+type GetProfileResponse struct {
+	ID        string
+	Email     string
+	Role      string
+	Scope     string
+	Status    string
+	CreatedAt string
+}

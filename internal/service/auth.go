@@ -87,3 +87,18 @@ func (s *AuthService) CheckPermission(ctx context.Context, req *v1.CheckPermissi
 		Allowed: resp.Allowed,
 	}, nil
 }
+
+func (s *AuthService) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v1.GetUserReply, error) {
+	resp, err := s.uc.GetUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetUserReply{
+		UserId:    resp.ID,
+		Email:     resp.Email,
+		Role:      resp.Role,
+		Scope:     resp.Scope,
+		Status:    resp.Status,
+		CreatedAt: resp.CreatedAt,
+	}, nil
+}
