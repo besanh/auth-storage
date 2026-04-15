@@ -1,0 +1,135 @@
+services:
+  timescale:
+    container_name: auth-storage-timescale-qa
+    image: timescale/timescaledb-ha:pg18.1-ts2.24.0
+    command: >
+      postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
+    environment:
+      POSTGRES_USER: "anhle"
+      POSTGRES_PASSWORD: "anhle"
+      POSTGRES_DB: "auth_storage"
+      TZ: "UTC"
+    ports:
+      - "54322:5432"
+    volumes:
+      - timescale_data_qa:/home/postgres/pgdata/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anhle -d auth_storage"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      auth-storage-network-qa:
+        aliases:
+          - timescale
+
+  redis:
+    image: redis:7-alpine
+    container_name: auth-storage-redis-qa
+    command: ["redis-server", "--requirepass", "anhle"]
+    environment:
+      - TZ=UTC
+    volumes:
+      - redis_data_qa:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "anhle", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      auth-storage-network-qa:
+        aliases:
+          - redis
+
+  migrate:
+    image: anhle3532/auth-storage-migrate:qa-latest
+    environment:
+      - DB_URL=postgres://anhle:anhle@timescale:5432/auth_storage?sslmode=disable
+    command: ["-path", "/migrations/sql", "up"]
+    depends_on:
+      timescale:
+        condition: service_healthy
+    networks:
+      - auth-storage-network-qa
+
+  spicedb:
+    image: authzed/spicedb:latest
+    container_name: auth-storage-spicedb-qa
+    command: ["serve", "--datastore-engine=memory"]
+    ports:
+      - "50052:50051"
+    environment:
+      - SPICE_DB_DEBUG_LOG_LEVEL=debug
+      - SPICEDB_GRPC_PRESHARED_KEY=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4=
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:50051"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      auth-storage-network-qa:
+        aliases:
+          - spicedb
+
+  spicedb-init:
+    image: authzed/zed:latest
+    container_name: auth-storage-spicedb-init-qa
+    depends_on:
+      spicedb:
+        condition: service_healthy
+    volumes:
+      - ../../internal/data/db/migrations/spicedb/schema.zed:/app/schema.zed:ro
+    command: schema write /app/schema.zed --endpoint=spicedb:50051 --token=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4= --insecure
+    networks:
+      - auth-storage-network-qa
+
+  hashicorp:
+    image: hashicorp/vault:latest
+    container_name: auth-storage-hashicorp-qa
+    ports:
+      - "8201:8200"
+    command: ["vault", "server", "-config=/vault/config/vault-config.hcl"]
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_UI: "true"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault_data_qa:/vault/file
+      - ../../vault-config.hcl:/vault/config/vault-config.hcl
+    networks:
+      auth-storage-network-qa:
+        aliases:
+          - hashicorp
+
+  api:
+    container_name: auth-storage-api-qa
+    image: anhle3532/auth-storage:qa-latest
+    env_file:
+      - ./qa.env
+    ports:
+      - "8002:8000"
+      - "9002:9000"
+    restart: unless-stopped
+    depends_on:
+      timescale:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      spicedb:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      spicedb-init:
+        condition: service_completed_successfully
+    networks:
+      - auth-storage-network-qa
+
+networks:
+  auth-storage-network-qa:
+    driver: bridge
+
+volumes:
+  timescale_data_qa:
+  redis_data_qa:
+  vault_data_qa:

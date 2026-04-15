@@ -112,6 +112,15 @@ sqlc-install:
 migrate: timescale
 	@$(DOCKER_COMPOSE_BIN) up migrate -d
 
+up: timescale
+	@$(DOCKER_COMPOSE_BIN) up -d
+
+down:
+	@$(DOCKER_COMPOSE_BIN) down
+
+restart:
+	@$(DOCKER_COMPOSE_BIN) restart
+
 redo-migrate: timescale
 	@$(DOCKER_COMPOSE_BIN) run --rm migrate -path /migrations/sql drop
 	@$(DOCKER_COMPOSE_BIN) up migrate

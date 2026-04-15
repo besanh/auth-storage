@@ -12,35 +12,43 @@ services:
     ports:
       - "54320:5432"
     volumes:
-      - ./tmp/postgres_data:/home/postgres/pgdata/data
+      - timescale_data:/home/postgres/pgdata/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anhle -d auth_storage"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
-      - auth-storage-network
+      auth-storage-network:
+        aliases:
+          - timescale
 
   redis:
     image: redis:7-alpine
     container_name: auth-storage-redis
-    ports:
-      - "6379:6379"
     command: ["redis-server", "--requirepass", "anhle"]
     environment:
       - TZ=UTC
     volumes:
-      - ./tmp/redis_data:/data
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "anhle", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
-      - auth-storage-network
+      auth-storage-network:
+        aliases:
+          - redis
 
   migrate:
-    container_name: auth-storage-migrate
-    build:
-      context: .
-      dockerfile: migrate.Dockerfile
+    image: anhle3532/auth-storage-migrate:dev-latest
     environment:
-      - DB_URL=postgres://anhle:anhle@auth-storage-timescale:5432/auth_storage?sslmode=disable
-    volumes:
-      - ./internal/data/db/migrations/sql:/migrations/sql
+      - DB_URL=postgres://anhle:anhle@timescale:5432/auth_storage?sslmode=disable
     command: ["-path", "/migrations/sql", "up"]
     depends_on:
-      - timescale
+      timescale:
+        condition: service_healthy
     networks:
       - auth-storage-network
 
@@ -49,31 +57,31 @@ services:
     container_name: auth-storage-spicedb
     command: ["serve", "--datastore-engine=memory"]
     ports:
-      - "50051:50051" # gRPC
-      - "8443:8443" # HTTP (optional)
+      - "50051:50051"
     environment:
       - SPICE_DB_DEBUG_LOG_LEVEL=debug
       - SPICEDB_GRPC_PRESHARED_KEY=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4=
-    networks:
-      - auth-storage-network
-    # 1. Added Healthcheck: The init script needs to know when gRPC is actually ready
     healthcheck:
       test: ["CMD", "grpc_health_probe", "-addr=localhost:50051"]
-      interval: 2s
-      timeout: 2s
-      retries: 15
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      auth-storage-network:
+        aliases:
+          - spicedb
 
   spicedb-init:
     image: authzed/zed:latest
     container_name: auth-storage-spicedb-init
-    networks:
-      - auth-storage-network
     depends_on:
       spicedb:
         condition: service_healthy
     volumes:
-      - ./internal/data/db/migrations/spicedb/schema.zed:/app/schema.zed:ro
+      - ../../internal/data/db/migrations/spicedb/schema.zed:/app/schema.zed:ro
     command: schema write /app/schema.zed --endpoint=spicedb:50051 --token=Wc/Q0tGYtxkF0ygKRSG1NiiTHkKVbld4autfkglRBU4= --insecure
+    networks:
+      - auth-storage-network
 
   hashicorp:
     image: hashicorp/vault:latest
@@ -82,28 +90,46 @@ services:
       - "8200:8200"
     command: ["vault", "server", "-config=/vault/config/vault-config.hcl"]
     environment:
-      VAULT_ADDR: "${VAULT_ADDR}"
+      VAULT_ADDR: "http://0.0.0.0:8200"
       VAULT_UI: "true"
     cap_add:
       - IPC_LOCK
     volumes:
-      - ./tmp/vault_data:/vault/file
-      - ./vault-config.hcl:/vault/config/vault-config.hcl
+      - vault_data:/vault/file
+      - ../../vault-config.hcl:/vault/config/vault-config.hcl
+    networks:
+      auth-storage-network:
+        aliases:
+          - hashicorp
+
+  api:
+    container_name: auth-storage-api
+    image: anhle3532/auth-storage:dev-latest
+    env_file:
+      - ./dev.env
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+    restart: unless-stopped
+    depends_on:
+      timescale:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      spicedb:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      spicedb-init:
+        condition: service_completed_successfully
     networks:
       - auth-storage-network
-
-  # swagger-ui:
-  #   image: swaggerapi/swagger-ui
-  #   container_name: auth-storage-swagger-ui
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     SWAGGER_JSON: /app/openapi.yaml
-  #   volumes:
-  #     - ./docs/openapi.yaml:/app/openapi.yaml
-  #   networks:
-  #     - auth-storage-network
 
 networks:
   auth-storage-network:
     driver: bridge
+
+volumes:
+  timescale_data:
+  redis_data:
+  vault_data:

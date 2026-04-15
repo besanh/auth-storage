@@ -4,11 +4,11 @@ GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
 SQLC := sqlc
 PROJECT_NAME := auth-storage
-ENV := dev
+ENV := stag
 DOCKER := docker
 DOCKER_COMPOSE_BIN := ENV=$(ENV) PROJECT_NAME=$(PROJECT_NAME) docker compose
 IMAGE_NAME := anhle3532/auth-storage
-IMAGE_TAG  := dev-latest
+IMAGE_TAG  := stag-latest
 
 ifeq ($(GOHOSTOS), windows)
 	#the `find.exe` is different from `find` in bash/shell.
@@ -112,6 +112,15 @@ sqlc-install:
 migrate: timescale
 	@$(DOCKER_COMPOSE_BIN) up migrate -d
 
+up: timescale
+	@$(DOCKER_COMPOSE_BIN) up -d
+
+down:
+	@$(DOCKER_COMPOSE_BIN) down
+
+restart:
+	@$(DOCKER_COMPOSE_BIN) restart
+
 redo-migrate: timescale
 	@$(DOCKER_COMPOSE_BIN) run --rm migrate -path /migrations/sql drop
 	@$(DOCKER_COMPOSE_BIN) up migrate
@@ -171,11 +180,6 @@ key-pair:
 clear-key-pair:
 	@rm ./cert/*
 
-.PHONY: swagger
-swagger:
-	@$(DOCKER_COMPOSE_BIN) up swagger-ui -d
-	@echo "Swagger UI is running at http://localhost:8080"
-
 .PHONY: vault-up
 vault-up:
 	@echo "🚀 Starting Vault (Persistent Mode)..."
@@ -185,23 +189,23 @@ vault-up:
 .PHONY: vault-init
 vault-init:
 	@echo "Initializing Vault..."
-	@docker exec -it auth-storage-hashicorp vault operator init
+	@docker exec -it auth-storage-hashicorp-stag vault operator init
 
 .PHONY: vault-unseal
 vault-unseal:
 	@echo "Unsealing Vault (requires 3 keys)..."
-	@docker exec -it auth-storage-hashicorp vault operator unseal
+	@docker exec -it auth-storage-hashicorp-stag vault operator unseal
 
 .PHONY: init-vault
 init-vault:
 	@echo "Checking Vault KV-V2 Secrets Engine..."
 	@set -a; [ -f .env ] && . ./.env; [ -f .vault.env ] && . ./.vault.env; set +a; \
-	if docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp vault secrets list | grep -q "^secret/"; then \
+	if docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp-stag vault secrets list | grep -q "^secret/"; then \
 		echo "✅ Vault is already initialized at /secret. Skipping."; \
 	else \
 		echo "Initializing Vault KV-V2..."; \
 		docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 \
-		auth-storage-hashicorp vault secrets enable -path=secret kv-v2 && \
+		auth-storage-hashicorp-stag vault secrets enable -path=secret kv-v2 && \
 		echo "✅ Vault successfully initialized."; \
 	fi
 
@@ -216,10 +220,10 @@ create-m2m-vault:
 	@SECRET=$$(openssl rand -hex 32); \
 	set -a; [ -f .env ] && . ./.env; [ -f .vault.env ] && . ./.vault.env; set +a; \
 	echo "Pushing to Vault..."; \
-	docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp \
+	docker exec -e VAULT_TOKEN=$${VAULT_DEV_ROOT_TOKEN_ID} -e VAULT_ADDR=http://127.0.0.1:8200 auth-storage-hashicorp-stag \
 		vault kv put secret/storage/m2m/$(id) client_id=$(id) client_secret=$$SECRET; \
 	echo "Inserting into Database..."; \
-	docker exec auth-storage-timescale sh -c \
+	docker exec auth-storage-timescale-stag sh -c \
 		"psql -U \$$POSTGRES_USER -d \$$POSTGRES_DB -c \"INSERT INTO machine_clients (client_id, client_secret_hash, name, scopes) VALUES ('$(id)', crypt('$$SECRET', gen_salt('bf')), '$(name)', '{}') ON CONFLICT (client_id) DO UPDATE SET client_secret_hash = EXCLUDED.client_secret_hash, name = EXCLUDED.name, updated_at = NOW();\""; \
 	echo "✅ M2M Client '$(id)' created successfully!"; \
 	echo "🔑 Secret stored in Vault at secret/storage/m2m/$(id)"
